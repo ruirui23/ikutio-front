@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 import type { Panorama360SphereProps } from '../types/components';
-import '../styles/Panorama360Sphere.css';
 
 export function Panorama360Sphere({
   imageUrl,
