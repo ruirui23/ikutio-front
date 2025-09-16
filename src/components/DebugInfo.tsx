@@ -5,7 +5,6 @@ import type { PathData } from '../types/streetView';
 
 interface DebugInfoProps {
   apiKey?: string;
-  location?: string;
   pathData?: PathData | null;
   currentPointIndex?: number;
   visible?: boolean;
@@ -13,7 +12,6 @@ interface DebugInfoProps {
 
 export function DebugInfo({ 
   apiKey, 
-  location, 
   pathData, 
   currentPointIndex = 0, 
   visible = true 
@@ -38,14 +36,11 @@ export function DebugInfo({
   // APIキーの状態をログ出力
   useEffect(() => {
     console.log('🔑 API Key Status:', apiKey ? '✅ Available' : '❌ Missing');
-    if (location) {
-      console.log('📍 Location:', location);
-    }
     if (pathData) {
       console.log('🗺️ PathData:', pathData.pathData.length, 'points loaded');
       console.log('📌 Current Point:', pathData.pathData[currentPointIndex]);
     }
-  }, [apiKey, location, pathData, currentPointIndex]);
+  }, [apiKey, pathData, currentPointIndex]);
 
   if (!visible) return null;
 
@@ -55,7 +50,7 @@ export function DebugInfo({
       const point = pathData.pathData[currentPointIndex];
       return `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}`;
     }
-    return location || 'N/A';
+    return 'データなし';
   };
 
   const debugText = `=== DEBUG INFO ===
@@ -63,7 +58,7 @@ Camera Pos: ${cameraPosition.join(', ')}
 Camera Rot: ${cameraRotation.join(', ')}
 API Key: ${apiKey ? '✅ OK' : '❌ Missing'}
 Current: ${getCurrentCoordinate()}
-${pathData ? `PathData: ${pathData.pathData.length} points (${currentPointIndex + 1}/${pathData.pathData.length})` : 'Mode: Location'}`;
+${pathData ? `PathData: ${pathData.pathData.length} points (${currentPointIndex + 1}/${pathData.pathData.length})` : 'データ未設定'}`;
 
   return (
     <Text

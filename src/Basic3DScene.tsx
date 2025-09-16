@@ -20,14 +20,11 @@ const xrStore = createXRStore({
 });
 
 export default function Basic3DScene() {
-  const [location, setLocation] = useState<string>('Shibuya Crossing, Tokyo');
-  const [inputLocation, setInputLocation] = useState<string>('Shibuya Crossing, Tokyo');
   const [pathData, setPathData] = useState<PathData | null>(null);
   const [currentPointIndex, setCurrentPointIndex] = useState<number>(0);
   const [inputPathData, setInputPathData] = useState<string>('');
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  
   
   const handlePathDataSubmit = () => {
     try {
@@ -35,7 +32,6 @@ export default function Basic3DScene() {
       if (parsedData.pathData && Array.isArray(parsedData.pathData)) {
         setPathData(parsedData);
         setCurrentPointIndex(0);
-        setLocation(''); 
       } else {
         alert('pathDataの形式が正しくありません');
       }
@@ -48,7 +44,7 @@ export default function Basic3DScene() {
   const loadSampleData = () => {
     const sampleData: PathData = {
       pathData: [
-        { latitude:  35.4122, longitude: 139.4130, timestamp: "2025-09-16T05:31:50Z" },
+        { latitude: 35.4122, longitude: 139.4130, timestamp: "2025-09-16T05:31:50Z" },
         { latitude: 33.8815906, longitude: 130.8789872, timestamp: "2025-09-16T05:32:10Z" },
         { latitude: 33.8815732, longitude: 130.8789877, timestamp: "2025-09-16T05:32:29Z" }
       ]
@@ -56,7 +52,6 @@ export default function Basic3DScene() {
     setPathData(sampleData);
     setCurrentPointIndex(0);
     setInputPathData(JSON.stringify(sampleData, null, 2));
-    setLocation('');
   };
   
   return (
@@ -76,35 +71,13 @@ export default function Basic3DScene() {
         </div>
       </div>
 
-      {/* 場所変更UI */}
+      {/* 座標データ入力UI */}
       <div className="location-controls-container">
-        <h3 className="location-controls-title">場所を変更</h3>
-        
-        {/* 従来の場所指定 */}
-        <div className="location-input-group">
-          <input
-            type="text"
-            value={inputLocation}
-            onChange={(e) => setInputLocation(e.target.value)}
-            placeholder="場所を入力（例: Shibuya Crossing, Tokyo）"
-            className="location-input"
-            disabled={pathData !== null}
-          />
-          <button
-            onClick={() => {
-              setLocation(inputLocation);
-              setPathData(null); // locationが設定された場合はpathDataをクリア
-            }}
-            className="location-submit-button"
-            disabled={pathData !== null}
-          >
-            移動
-          </button>
-        </div>
+        <h3 className="location-controls-title">座標データを設定</h3>
         
         {/* pathData入力 */}
         <div className="path-data-input-group">
-          <h4>座標データを使用</h4>
+          <h4>座標データ (JSON形式)</h4>
           <textarea
             value={inputPathData}
             onChange={(e) => setInputPathData(e.target.value)}
@@ -166,7 +139,7 @@ export default function Basic3DScene() {
         <div className="current-location-text">
           {pathData ? 
             `座標データ使用中 (${pathData.pathData.length}地点)` : 
-            `現在: ${location}`
+            'データが設定されていません'
           }
         </div>
       </div>
@@ -181,14 +154,12 @@ export default function Basic3DScene() {
           <XROrigin position={[0, 0, 0]} />
           <ambientLight intensity={1} />
           <PanoramaSphere 
-            location={pathData ? undefined : location}
             pathData={pathData || undefined}
             currentPointIndex={currentPointIndex}
             apiKey={apiKey} 
           />
           <DebugInfo
             apiKey={apiKey}
-            location={location}
             pathData={pathData}
             currentPointIndex={currentPointIndex}
             visible={true}
