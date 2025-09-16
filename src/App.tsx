@@ -4,8 +4,9 @@ import HomeScreen from './HomeScreen';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
 import Map from './pages/map';
+import { VRControllerDemo } from './pages/VRControllerDemo';
 
-type AppState = 'login' | 'home' | 'game';
+type AppState = 'login' | 'home' | 'game' | 'vr-demo';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('login');
@@ -28,6 +29,10 @@ export default function App() {
 
   const handleStartGame = () => {
     setAppState('game');
+  };
+
+  const handleStartVRDemo = () => {
+    setAppState('vr-demo');
   };
 
   const handleLogout = () => {
@@ -61,10 +66,14 @@ export default function App() {
           user={user} 
           onStartGame={handleStartGame}
           onLogout={handleLogout}
+          onStartVRDemo={handleStartVRDemo}
         />
       )}
       {appState === 'game' && (
         <Map />
+      )}
+      {appState === 'vr-demo' && (
+        <VRControllerDemo />
       )}
     </div>
   );
