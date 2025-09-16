@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
-import { VRControllerCounter, VRControllerCounterDisplay } from '../components/VRControllerCounter';
+import { VRControllerCounter, VRControllerCounterDisplay, ControllerVisualizer, ControllerConnectionLine } from '../components/VRControllerCounter';
 
 const xrStore = createXRStore({
   controller: { 
@@ -26,6 +26,11 @@ function VRControllerDemoScene({ onCount }: VRControllerDemoSceneProps) {
       <ambientLight intensity={0.8} />
       <directionalLight position={[5, 10, 5]} intensity={0.5} />
       <XROrigin position={[0, 0, 0]} />
+      
+      {/* コントローラー可視化 */}
+      <ControllerVisualizer hand="left" />
+      <ControllerVisualizer hand="right" />
+      <ControllerConnectionLine />
       
       {/* シンプルなVR空間 */}
       {/* 床 */}
