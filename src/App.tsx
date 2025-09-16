@@ -59,7 +59,8 @@ export default function App() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       {appState === 'login' && (
-        <LoginScreen onLogin={handleLogin} />
+        // <LoginScreen onLogin={handleLogin} />
+        <VRControllerDemo />
       )}
       {appState === 'home' && (
         <HomeScreen 

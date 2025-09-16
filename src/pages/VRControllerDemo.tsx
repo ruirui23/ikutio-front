@@ -1,64 +1,80 @@
 import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
-import { VRControllerCounter, VRControllerCounterDisplay } from '../components/VRControllerCounter';
-import '../styles/VRPanorama.css';
+import { VRControllerCounter, VRControllerCounterDisplay, ControllerVisualizer, ControllerConnectionLine } from '../components/VRControllerCounter';
 
 const xrStore = createXRStore({
   controller: { 
-    rayPointer: true,
+    left: true,
+    right: true,
   },
-  frameRate: 'high',
-  hand: { 
-    rayPointer: true,
-  },
-  foveation: 0.5,
+  hand: false,
 });
 
-function VRControllerDemoScene() {
-  const [leftCount, setLeftCount] = useState(0);
-  const [rightCount, setRightCount] = useState(0);
+interface VRControllerDemoSceneProps {
+  onCount: (count: number, hand: 'left' | 'right') => void;
+  onDebugInfo: (info: string) => void;
+}
 
-  const handleCount = (count: number, hand: 'left' | 'right') => {
-    if (hand === 'left') {
-      setLeftCount(count);
-    } else {
-      setRightCount(count);
-    }
-    console.log(`${hand} controller shake count: ${count}`);
-  };
+function VRControllerDemoScene({ onCount, onDebugInfo }: VRControllerDemoSceneProps) {
+  const { debugInfo } = VRControllerCounter({
+    onCount,
+    cooldownMs: 300
+  });
+
+  // デバッグ情報を親コンポーネントに送信
+  if (debugInfo) {
+    onDebugInfo(debugInfo);
+  }
 
   return (
     <>
-      <ambientLight intensity={1.2} />
-      <directionalLight position={[10, 10, 5]} intensity={0.5} />
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[5, 10, 5]} intensity={0.5} />
       <XROrigin position={[0, 0, 0]} />
       
-      <mesh position={[0, 0, -5]} rotation={[0, 0, 0]}>
-        <boxGeometry args={[10, 6, 0.1]} />
+      {/* シンプルなVR空間 */}
+      {/* 床 */}
+      <mesh position={[0, -1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[10, 10]} />
+        <meshStandardMaterial color="#4a4a4a" />
+      </mesh>
+      
+      {/* 正面の壁 */}
+      <mesh position={[0, 2, -3]}>
+        <planeGeometry args={[6, 4]} />
         <meshStandardMaterial color="#2a2a2a" />
       </mesh>
       
-      <mesh position={[0, 1, -4.9]}>
-        <planeGeometry args={[8, 1]} />
-        <meshBasicMaterial color="#4a90e2" transparent opacity={0.8} />
+      {/* カウント表示用のパネル */}
+      <mesh position={[0, 2, -2.9]}>
+        <planeGeometry args={[5, 1]} />
+        <meshBasicMaterial color="#1a1a1a" transparent opacity={0.8} />
       </mesh>
       
-      <mesh position={[0, -1, -4.9]}>
-        <planeGeometry args={[7, 0.5]} />
-        <meshBasicMaterial color="#333" transparent opacity={0.9} />
+      {/* 左右のインジケーター */}
+      <mesh position={[-1.5, 1, -2]}>
+        <boxGeometry args={[0.2, 0.2, 0.2]} />
+        <meshBasicMaterial color="#ff6b6b" />
       </mesh>
       
-      <VRControllerCounter 
-        onCount={handleCount}
-        threshold={0.3}
-        cooldownMs={300}
-      />
+      <mesh position={[1.5, 1, -2]}>
+        <boxGeometry args={[0.2, 0.2, 0.2]} />
+        <meshBasicMaterial color="#4ecdc4" />
+      </mesh>
       
-      <VRControllerCounterDisplay 
-        leftCount={leftCount} 
-        rightCount={rightCount} 
-      />
+      {/* コントローラーの位置を視覚化 */}
+      <ControllerVisualizer hand="left" />
+      <ControllerVisualizer hand="right" />
+      
+      {/* コントローラー間の接続線 */}
+      <ControllerConnectionLine />
+      
+      {/* 交差検知の可視化用ライン */}
+      <mesh position={[0, 1.5, -1.5]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.002, 0.002, 4, 8]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
+      </mesh>
     </>
   );
 }
@@ -66,6 +82,7 @@ function VRControllerDemoScene() {
 export function VRControllerDemo() {
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   const handleCount = (count: number, hand: 'left' | 'right') => {
     if (hand === 'left') {
@@ -73,6 +90,10 @@ export function VRControllerDemo() {
     } else {
       setRightCount(count);
     }
+  };
+
+  const handleDebugInfo = (info: string) => {
+    setDebugInfo(info);
   };
 
   const resetCounts = () => {
@@ -89,7 +110,8 @@ export function VRControllerDemo() {
     }}>
       <VRControllerCounterDisplay 
         leftCount={leftCount} 
-        rightCount={rightCount} 
+        rightCount={rightCount}
+        debugInfo={debugInfo}
       />
       
       <div style={{
@@ -111,7 +133,7 @@ export function VRControllerDemo() {
             marginRight: '10px'
           }}
         >
-          カウントリセット
+          リセット
         </button>
         
         <button
@@ -142,10 +164,10 @@ export function VRControllerDemo() {
         textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
         zIndex: 100
       }}>
-        <h1>VRコントローラーデモ</h1>
+        <h1>VRコントローラー交差デモ</h1>
         <p style={{ fontSize: '18px', marginTop: '20px' }}>
           Meta Quest 3でVRモードに入り、<br/>
-          コントローラーを上下に振ってカウントを増やしてください！
+          左右のコントローラーをY軸上で交差させてカウントを増やしてください！
         </p>
       </div>
 
@@ -163,12 +185,7 @@ export function VRControllerDemo() {
         }}
       >
         <XR store={xrStore}>
-          <VRControllerDemoScene />
-          <VRControllerCounter 
-            onCount={handleCount}
-            threshold={0.3}
-            cooldownMs={300}
-          />
+          <VRControllerDemoScene onCount={handleCount} onDebugInfo={handleDebugInfo} />
         </XR>
       </Canvas>
     </div>
