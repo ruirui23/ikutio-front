@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
-import Basic3DScene from './Basic3DScene';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
+import Map from './pages/map';
 
 type AppState = 'login' | 'home' | 'game';
 
@@ -64,7 +64,7 @@ export default function App() {
         />
       )}
       {appState === 'game' && (
-        <Basic3DScene />
+        <Map />
       )}
     </div>
   );
