@@ -21,7 +21,8 @@ export interface InteractivePanoramaProps extends BasePanoramaProps {
 }
 
 export interface VRPanoramaProps extends BasePanoramaProps {
-    // VR固有のプロパティがあれば追加
+    /** コントローラー表示の有効/無効 */
+    showControllers?: boolean;
 }
 
 // Panorama360Sphereコンポーネントのプロパティ

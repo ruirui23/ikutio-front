@@ -4,8 +4,9 @@ import HomeScreen from './HomeScreen';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
 import Map from './pages/map';
+import './styles/App.css';
 
-type AppState = 'login' | 'home' | 'game';
+type AppState = 'login' | 'home' | 'game' ;
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('login');
@@ -38,21 +39,14 @@ export default function App() {
 
   if (loading) {
     return (
-      <div style={{
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: '#000'
-      }}>
-        <div style={{ color: 'white', fontSize: '18px' }}>Loading...</div>
+      <div className="loading-container">
+        <div className="loading-text">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
+    <div className="app-root">
       {appState === 'login' && (
         <LoginScreen onLogin={handleLogin} />
       )}

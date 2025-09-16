@@ -46,6 +46,7 @@ export default function VRPanoramaPage() {
             apiKey={apiKey}
             height="600px"
             autoRotate={false}
+            showControllers={true}
           />
         )}
       </div>
