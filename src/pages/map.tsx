@@ -5,9 +5,9 @@ import type { PathData } from '../types/streetView';
 import '../styles/map.css';
 
 export default function VRPanoramaPage() {
-  const [pathData, setPathData] = useState<PathData | null>(null);
-  const [currentPointIndex, setCurrentPointIndex] = useState<number>(0); 
-  const [viewMode, setViewMode] = useState<'web' | 'vr'>('web'); // デフォルトはWeb版
+  const [pathData, _setPathData] = useState<PathData | null>(null);
+  const [currentPointIndex, _setCurrentPointIndex] = useState<number>(0); 
+  const [viewMode, setViewMode] = useState<'web' | 'vr'>('web'); 
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   
