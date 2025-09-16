@@ -2,6 +2,9 @@ import { useState, useRef } from 'react';
 import { useXR } from '@react-three/xr';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { VRControllerService } from '../services/vrControllerService';
+import type { VRControllerCountCallback } from '../types/vrController';
+import '../styles/VRControllerCounter.css';
 
 export function ControllerVisualizer({ hand }: { hand: 'left' | 'right' }) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -107,7 +110,7 @@ export function ControllerConnectionLine() {
 }
 
 interface VRControllerCounterProps {
-  onCount?: (count: number, hand: 'left' | 'right') => void;
+  onCount?: VRControllerCountCallback;
   threshold?: number;
   cooldownMs?: number;
 }
@@ -123,92 +126,23 @@ export function VRControllerCounter({
   const { gl } = useThree();
   const session = useXR(state => state.session);
   
-  const lastCrossTime = useRef<number>(0);
-  const wasLeftAbove = useRef<boolean | null>(null);
-  const bothInitialized = useRef(false);
+  // VRControllerServiceのインスタンスを取得
+  const vrControllerService = useRef(VRControllerService.getInstance());
 
   useFrame(() => {
-    if (!session || !gl.xr.isPresenting) {
-      return;
+    const service = vrControllerService.current;
+    
+    // コントローラーデータを取得
+    const controllerData = service.getControllerData(gl, session || null);
+    
+    // 交差検出を実行
+    const crossingResult = service.detectCrossing(controllerData, cooldownMs, onCount);
+    
+    // カウント状態を更新
+    if (crossingResult.occurred) {
+      setLeftCount(crossingResult.leftCount);
+      setRightCount(crossingResult.rightCount);
     }
-    
-    const now = Date.now();
-    
-    // WebXRの状態をチェック
-    const referenceSpace = gl.xr.getReferenceSpace();
-    const frame = gl.xr.getFrame();
-    
-    if (!referenceSpace || !frame) {
-      return;
-    }
-    
-    // 左右のコントローラーを検索
-    const leftSource = Array.from(session.inputSources).find(
-      source => source.handedness === 'left' && source.targetRayMode === 'tracked-pointer'
-    );
-    const rightSource = Array.from(session.inputSources).find(
-      source => source.handedness === 'right' && source.targetRayMode === 'tracked-pointer'
-    );
-    
-    if (!leftSource || !rightSource) {
-      bothInitialized.current = false;
-      return;
-    }
-    
-    // スペースの取得（gripSpace優先、なければtargetRaySpace）
-    const leftSpace = leftSource.gripSpace || leftSource.targetRaySpace;
-    const rightSpace = rightSource.gripSpace || rightSource.targetRaySpace;
-    
-    if (!leftSpace || !rightSpace) {
-      return;
-    }
-    
-    // ポーズの取得
-    const leftPose = frame.getPose(leftSpace, referenceSpace);
-    const rightPose = frame.getPose(rightSpace, referenceSpace);
-    
-    if (!leftPose || !rightPose) {
-      return;
-    }
-    
-    // 位置データを取得
-    const leftPos = leftPose.transform.position;
-    const rightPos = rightPose.transform.position;
-    
-    // 初期化完了
-    if (!bothInitialized.current) {
-      bothInitialized.current = true;
-    }
-    
-    // Y軸での上下関係を判定
-    const isLeftAbove = leftPos.y > rightPos.y;
-    const yDifference = Math.abs(leftPos.y - rightPos.y);
-    
-    // クールダウン期間をチェック
-    const cooldownRemaining = Math.max(0, cooldownMs - (now - lastCrossTime.current));
-    
-    if (wasLeftAbove.current !== null && 
-        wasLeftAbove.current !== isLeftAbove && 
-        cooldownRemaining === 0 && 
-        yDifference > 0.02) { 
-      
-      // 交差が発生！
-      const totalCount = leftCount + rightCount + 1;
-      const triggerHand = isLeftAbove ? 'right' : 'left';
-      
-      // カウントを更新
-      const newLeftCount = Math.ceil(totalCount / 2);
-      const newRightCount = Math.floor(totalCount / 2);
-      
-      setLeftCount(newLeftCount);
-      setRightCount(newRightCount);
-      
-      onCount?.(totalCount, triggerHand);
-      lastCrossTime.current = now;
-    }
-    
-    // 上下関係を保存（次回の比較用）
-    wasLeftAbove.current = isLeftAbove;
   });
 
   return { leftCount, rightCount };
@@ -222,32 +156,15 @@ export function VRControllerCounterDisplay({
   rightCount: number; 
 }) {
   return (
-    <div style={{
-      position: 'absolute',
-      top: '20px',
-      left: '20px',
-      color: 'white',
-      fontSize: '24px',
-      fontWeight: 'bold',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      padding: '15px',
-      borderRadius: '10px',
-      zIndex: 1000,
-      maxWidth: '450px',
-      border: '2px solid rgba(255, 255, 255, 0.2)'
-    }}>
-      <div style={{ marginBottom: '10px' }}>
-        <span style={{ color: '#ff6b6b' }}>左:</span> {leftCount}回 | 
-        <span style={{ color: '#4ecdc4' }}> 右:</span> {rightCount}回
+    <div className="vr-counter-display">
+      <div className="vr-counter-count-row">
+        <span className="vr-counter-left">左:</span> {leftCount}回 | 
+        <span className="vr-counter-right"> 右:</span> {rightCount}回
       </div>
-      <div style={{ 
-        fontSize: '16px', 
-        color: '#ffd93d', 
-        marginBottom: '10px' 
-      }}>
+      <div className="vr-counter-total">
         総計: {leftCount + rightCount}回
       </div>
-      <div style={{ fontSize: '14px', opacity: 0.9 }}>
+      <div className="vr-counter-instruction">
         💡 左右のコントローラーをY軸で交差させてください
       </div>
     </div>

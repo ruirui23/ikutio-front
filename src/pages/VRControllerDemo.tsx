@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
-import { VRControllerCounter, VRControllerCounterDisplay, ControllerVisualizer, ControllerConnectionLine } from '../components/VRControllerCounter';
+import { VRControllerCounter, VRControllerCounterDisplay } from '../components/VRControllerCounter';
 
 const xrStore = createXRStore({
   controller: { 
@@ -13,19 +13,13 @@ const xrStore = createXRStore({
 
 interface VRControllerDemoSceneProps {
   onCount: (count: number, hand: 'left' | 'right') => void;
-  onDebugInfo: (info: string) => void;
 }
 
-function VRControllerDemoScene({ onCount, onDebugInfo }: VRControllerDemoSceneProps) {
-  const { debugInfo } = VRControllerCounter({
+function VRControllerDemoScene({ onCount }: VRControllerDemoSceneProps) {
+  VRControllerCounter({
     onCount,
     cooldownMs: 300
   });
-
-  // デバッグ情報を親コンポーネントに送信
-  if (debugInfo) {
-    onDebugInfo(debugInfo);
-  }
 
   return (
     <>
@@ -62,19 +56,6 @@ function VRControllerDemoScene({ onCount, onDebugInfo }: VRControllerDemoScenePr
         <boxGeometry args={[0.2, 0.2, 0.2]} />
         <meshBasicMaterial color="#4ecdc4" />
       </mesh>
-      
-      {/* コントローラーの位置を視覚化 */}
-      <ControllerVisualizer hand="left" />
-      <ControllerVisualizer hand="right" />
-      
-      {/* コントローラー間の接続線 */}
-      <ControllerConnectionLine />
-      
-      {/* 交差検知の可視化用ライン */}
-      <mesh position={[0, 1.5, -1.5]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.002, 0.002, 4, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
-      </mesh>
     </>
   );
 }
@@ -82,7 +63,6 @@ function VRControllerDemoScene({ onCount, onDebugInfo }: VRControllerDemoScenePr
 export function VRControllerDemo() {
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
-  const [debugInfo, setDebugInfo] = useState<string>('');
 
   const handleCount = (count: number, hand: 'left' | 'right') => {
     if (hand === 'left') {
@@ -90,10 +70,6 @@ export function VRControllerDemo() {
     } else {
       setRightCount(count);
     }
-  };
-
-  const handleDebugInfo = (info: string) => {
-    setDebugInfo(info);
   };
 
   const resetCounts = () => {
@@ -111,7 +87,6 @@ export function VRControllerDemo() {
       <VRControllerCounterDisplay 
         leftCount={leftCount} 
         rightCount={rightCount}
-        debugInfo={debugInfo}
       />
       
       <div style={{
@@ -185,7 +160,7 @@ export function VRControllerDemo() {
         }}
       >
         <XR store={xrStore}>
-          <VRControllerDemoScene onCount={handleCount} onDebugInfo={handleDebugInfo} />
+          <VRControllerDemoScene onCount={handleCount} />
         </XR>
       </Canvas>
     </div>

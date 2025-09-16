@@ -56,8 +56,8 @@ function VRPanoramaLoader({
       <Panorama360Sphere
         imageUrl={panoramaUrl}
         radius={50} 
-        widthSegments={64}
-        heightSegments={32}
+        widthSegments={128}
+        heightSegments={64}
         autoRotate={autoRotate}
         autoRotateSpeed={autoRotateSpeed}
       />
