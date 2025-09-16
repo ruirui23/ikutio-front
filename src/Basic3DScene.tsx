@@ -1,6 +1,7 @@
 import React, { useState,} from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
+import { XR, createXRStore, XROrigin } from '@react-three/xr';
 import { PanoramaSphere } from './components/PanoramaSphere';
 // カメラ情報表示
 function CameraInfo() {
@@ -46,6 +47,18 @@ function PerformanceMonitor({ onFpsUpdate }: { onFpsUpdate: (fps: number) => voi
   return null;
 }
 
+// XRストアを作成
+const xrStore = createXRStore({
+  controller: { 
+    rayPointer: true,
+  },
+  frameRate: 'high',
+  hand: { 
+    rayPointer: true,
+  },
+  foveation: 0.5,
+});
+
 // メインコンポーネント
 export default function Basic3DScene() {
   const [fps, setFps] = useState<number>(0);
@@ -62,6 +75,50 @@ export default function Basic3DScene() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      {/* VRボタン */}
+      <div style={{
+        position: 'absolute',
+        top: '10px',
+        right: '120px',
+        background: 'rgba(0, 0, 0, 0.9)',
+        color: 'white',
+        padding: '15px',
+        borderRadius: '8px',
+        zIndex: 1001,
+        maxWidth: '250px'
+      }}>
+        <h4 style={{ margin: '0 0 10px 0', color: '#4ECDC4' }}>VR体験</h4>
+        <button
+          onClick={() => xrStore.enterVR()}
+          style={{
+            width: '100%',
+            padding: '12px 15px',
+            background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}
+        >
+          VRで360度体験
+        </button>
+        <div style={{ 
+          marginTop: '8px', 
+          fontSize: '11px', 
+          opacity: 0.8,
+          lineHeight: '1.3'
+        }}>
+          ※VRゴーグルが必要です<br/>
+          Meta Quest, Vive等に対応
+        </div>
+      </div>
+
       {/* 場所変更UI */}
       <div style={{
         position: 'absolute',
@@ -74,7 +131,7 @@ export default function Basic3DScene() {
         zIndex: 1000,
         maxWidth: '300px'
       }}>
-        <h3 style={{ margin: '0 0 10px 0', color: '#4CAF50' }}>🌍 場所を変更</h3>
+        <h3 style={{ margin: '0 0 10px 0', color: '#4CAF50' }}> 場所を変更</h3>
         <input
           type="text"
           value={inputLocation}
@@ -101,34 +158,10 @@ export default function Basic3DScene() {
             cursor: 'pointer'
           }}
         >
-          📍 移動
+          移動
         </button>
         <div style={{ marginTop: '10px', fontSize: '12px', opacity: 0.8 }}>
           現在: {location}
-        </div>
-      </div>
-
-      {/* FPS表示 */}
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        right: '10px',
-        background: 'rgba(0, 0, 0, 0.8)',
-        color: 'white',
-        padding: '10px',
-        borderRadius: '8px',
-        fontFamily: 'monospace',
-        fontSize: '14px',
-        zIndex: 1000
-      }}>
-        <div>FPS: {fps}</div>
-        <div style={{ 
-          color: fps > 30 ? '#4CAF50' : fps > 15 ? '#FF9800' : '#F44336' 
-        }}>
-          Status: {fps > 30 ? '良好' : fps > 15 ? '注意' : '低下'}
-        </div>
-        <div style={{ fontSize: '10px', marginTop: '5px', opacity: 0.7 }}>
-          API: {apiKey ? '✅' : '❌'}
         </div>
       </div>
       
@@ -137,18 +170,23 @@ export default function Basic3DScene() {
         style={{ background: '#000' }}
         gl={{ antialias: true, alpha: false }}
       >
-        <ambientLight intensity={1} />
-        <PanoramaSphere location={location} apiKey={apiKey} />
-        <CameraInfo />
-        <PerformanceMonitor onFpsUpdate={setFps} />
-        <OrbitControls
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={true}
-          target={[0, 0, 0]}
-          maxDistance={10}
-          minDistance={0.1}
-        />
+        <XR store={xrStore}>
+          {/* VR環境でのユーザー位置を中心に設定 */}
+          <XROrigin position={[0, 0, 0]} />
+          <ambientLight intensity={1} />
+          <PanoramaSphere location={location} apiKey={apiKey} />
+          <CameraInfo />
+          <PerformanceMonitor onFpsUpdate={setFps} />
+          {/* VR環境では OrbitControls は自動的に無効化される */}
+          <OrbitControls
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={true}
+            target={[0, 0, 0]}
+            maxDistance={10}
+            minDistance={0.1}
+          />
+        </XR>
       </Canvas>
     </div>
   );

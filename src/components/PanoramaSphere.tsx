@@ -15,7 +15,6 @@ export function PanoramaSphere({ location, apiKey }: PanoramaSphereProps) {
   const [lastLocation, setLastLocation] = useState<string>('');
   
   const createTestTexture = useCallback(() => {
-    console.log('Creating test texture...');
     const canvas = document.createElement('canvas');
     canvas.width = 1024;
     canvas.height = 512;
@@ -62,7 +61,10 @@ export function PanoramaSphere({ location, apiKey }: PanoramaSphereProps) {
     }
     
     const canvasTexture = new THREE.CanvasTexture(canvas);
-    canvasTexture.mapping = THREE.EquirectangularReflectionMapping;
+    canvasTexture.mapping = THREE.UVMapping;
+    canvasTexture.wrapS = THREE.RepeatWrapping;
+    canvasTexture.wrapT = THREE.ClampToEdgeWrapping;
+    canvasTexture.flipY = false;
     setTexture(canvasTexture);
   }, []);
   
@@ -71,29 +73,31 @@ export function PanoramaSphere({ location, apiKey }: PanoramaSphereProps) {
       setLastLocation(location);
       
       if (apiKey && apiKey.trim() !== '') {
-        console.log('Loading Street View for:', location);
         setLoading(true);
         setError(null);
         
-        const size = '640x640';
-        const fov = 90;
+        const size = '1024x512'; 
+        const fov = 120; 
         const heading = 0;
         const pitch = 0;
         
         const url = `https://maps.googleapis.com/maps/api/streetview?size=${size}&location=${encodeURIComponent(location)}&heading=${heading}&pitch=${pitch}&fov=${fov}&key=${apiKey}`;
         
-        console.log('Street View API URL:', url);
-        
         const loader = new THREE.TextureLoader();
         loader.load(
           url,
           (loadedTexture) => {
-            console.log('✅ Street View image loaded successfully');
-            loadedTexture.mapping = THREE.EquirectangularReflectionMapping;
+            loadedTexture.mapping = THREE.UVMapping;
+            loadedTexture.wrapS = THREE.RepeatWrapping;
+            loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
+            loadedTexture.flipY =false;
+            loadedTexture.needsUpdate = true;
             setTexture(loadedTexture);
             setLoading(false);
           },
-          undefined,
+          (progress) => {
+            console.log('Loading progress:', progress);
+          },
           (error) => {
             console.error('❌ Error loading Street View image:', error);
             setError('Street View画像の読み込みに失敗しました');
@@ -109,11 +113,23 @@ export function PanoramaSphere({ location, apiKey }: PanoramaSphereProps) {
     }
   }, [location, apiKey, createTestTexture, lastLocation, texture]);
   
+  React.useEffect(() => {
+    if (meshRef.current && texture) {
+      const material = meshRef.current.material as THREE.MeshBasicMaterial;
+      material.map = texture;
+      material.needsUpdate = true;
+    }
+  }, [texture]);
+
   return (
     <>
-      <mesh ref={meshRef} scale={[-1, 1, 1]} rotation={[0, Math.PI, 0]}>
-        <sphereGeometry args={[50, 60, 40]} />
-        <meshBasicMaterial map={texture} side={THREE.BackSide} />
+      <mesh ref={meshRef} scale={[-1, 1, 1]} rotation={[0, 0, Math.PI]}>
+        <sphereGeometry args={[50, 64, 32]} />
+        <meshBasicMaterial 
+          map={texture} 
+          side={THREE.BackSide} 
+          transparent={false}
+        />
       </mesh>
       
       {loading && (
