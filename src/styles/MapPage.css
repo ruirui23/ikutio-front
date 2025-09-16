@@ -5,6 +5,76 @@
   position: relative;
 }
 
+/* 設定ページコンテナ */
+.map-settings-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 現在の状態表示 */
+.current-status {
+  margin-bottom: 2rem;
+}
+
+.status-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.status-item {
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.status-item:last-child {
+  margin-bottom: 0;
+}
+
+/* クイックアクション */
+.quick-actions {
+  margin-bottom: 2rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 200px;
+}
+
+.panorama-btn {
+  background: linear-gradient(45deg, #3498db, #2ecc71);
+  color: white;
+}
+
+.panorama-btn:hover {
+  background: linear-gradient(45deg, #2980b9, #27ae60);
+  transform: translateY(-2px);
+}
+
+.vr-btn {
+  background: linear-gradient(45deg, #e74c3c, #f39c12);
+  color: white;
+}
+
+.vr-btn:hover {
+  background: linear-gradient(45deg, #c0392b, #e67e22);
+  transform: translateY(-2px);
+}
+
 /* 表示モード切り替えUI */
 .view-mode-controls {
   position: absolute;

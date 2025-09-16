@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { InteractivePanorama } from '../components/InteractivePanorama';
-import { VRPanorama } from '../components/VRPanorama';
+import { Link } from 'react-router-dom';
 import type { PathData } from '../types/streetView';
 import '../styles/MapPage.css';
 
@@ -8,7 +7,6 @@ export default function Map() {
   const [pathData, setPathData] = useState<PathData | null>(null);
   const [currentPointIndex, setCurrentPointIndex] = useState<number>(0);
   const [inputPathData, setInputPathData] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'panorama' | 'vr-panorama'>('panorama');
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   
@@ -18,6 +16,8 @@ export default function Map() {
       if (parsedData.pathData && Array.isArray(parsedData.pathData)) {
         setPathData(parsedData);
         setCurrentPointIndex(0);
+        // データが設定されたことを知らせる
+        alert(`座標データが設定されました (${parsedData.pathData.length}地点)`);
       } else {
         alert('pathDataの形式が正しくありません');
       }
@@ -41,124 +41,41 @@ export default function Map() {
   };
   
   return (
-    <div className="basic3d-scene-container">
-      {/* 表示モード切り替え */}
-      <div className="view-mode-controls">
-        <h4 className="view-mode-title">表示モード</h4>
-        <div className="view-mode-buttons">
-          <button
-            onClick={() => setViewMode('panorama')}
-            className={`view-mode-button ${viewMode === 'panorama' ? 'active' : ''}`}
-          >
-            360°パノラマ
-          </button>
-          <button
-            onClick={() => setViewMode('vr-panorama')}
-            className={`view-mode-button ${viewMode === 'vr-panorama' ? 'active' : ''}`}
-          >
-            VRパノラマ
-          </button>
+    <div className="map-settings-container">
+      {/* ページヘッダー */}
+      <div className="page-header">
+        <h1>座標データ設定</h1>
+        <p>パノラマビューで使用する座標データを設定できます</p>
+      </div>
+
+      {/* 現在の状態表示 */}
+      <div className="current-status">
+        <h3>現在の設定状況</h3>
+        <div className="status-card">
+          <div className="status-item">
+            <strong>API Key:</strong> {apiKey ? '設定済み' : '未設定'}
+          </div>
+          <div className="status-item">
+            <strong>座標データ:</strong> {pathData ? `${pathData.pathData.length}地点設定済み` : '未設定'}
+          </div>
+          {pathData && (
+            <div className="status-item">
+              <strong>現在地点:</strong> {currentPointIndex + 1} / {pathData.pathData.length}
+            </div>
+          )}
         </div>
       </div>
-      
-      {/* 360度パノラマビューモード */}
-      {viewMode === 'panorama' && (
-        <div className="panorama-section">
-          <h3>360度パノラマビュー</h3>
-          <InteractivePanorama
-            pathData={pathData || undefined}
-            currentPointIndex={currentPointIndex}
-            apiKey={apiKey}
-            height="500px"
-            autoRotate={false}
-          />
-        </div>
-      )}
 
-      {/* VRパノラマビューモード */}
-      {viewMode === 'vr-panorama' && (
-        <div className="vr-panorama-section">
-          <h3>VR 360度パノラマビュー</h3>
-          <VRPanorama
-            pathData={pathData || undefined}
-            currentPointIndex={currentPointIndex}
-            apiKey={apiKey}
-            height="500px"
-            autoRotate={false}
-          />
-        </div>
-      )}
-
-      {/* 座標データ入力UI */}
-      <div className="location-controls-container">
-        <h3 className="location-controls-title">座標データを設定</h3>
-        
-        {/* pathData入力 */}
-        <div className="path-data-input-group">
-          <h4>座標データ (JSON形式)</h4>
-          <textarea
-            value={inputPathData}
-            onChange={(e) => setInputPathData(e.target.value)}
-            placeholder='{"pathData": [{"latitude": 33.881582, "longitude": 130.8789885, "timestamp": "2025-09-16T05:31:50Z"}]}'
-            className="path-data-textarea"
-            rows={4}
-          />
-          <div className="path-data-buttons">
-            <button onClick={handlePathDataSubmit} className="path-data-submit-button">
-              座標データを設定
-            </button>
-            <button onClick={loadSampleData} className="sample-data-button">
-              サンプルデータを読み込み
-            </button>
-            <button
-              onClick={() => {
-                setPathData(null);
-                setInputPathData('');
-                setCurrentPointIndex(0);
-              }}
-              className="clear-data-button"
-            >
-              クリア
-            </button>
-          </div>
-        </div>
-        
-        {/* ナビゲーションコントロール */}
-        {pathData && pathData.pathData && pathData.pathData.length > 1 && (
-          <div className="navigation-controls">
-            <h4>ナビゲーション</h4>
-            <div className="navigation-buttons">
-              <button
-                onClick={() => setCurrentPointIndex(Math.max(0, currentPointIndex - 1))}
-                disabled={currentPointIndex === 0}
-                className="nav-button prev-button"
-              >
-                ← 前の地点
-              </button>
-              <span className="point-indicator">
-                {currentPointIndex + 1} / {pathData.pathData.length}
-              </span>
-              <button
-                onClick={() => setCurrentPointIndex(Math.min(pathData.pathData.length - 1, currentPointIndex + 1))}
-                disabled={currentPointIndex === pathData.pathData.length - 1}
-                className="nav-button next-button"
-              >
-                次の地点 →
-              </button>
-            </div>
-            {pathData.pathData[currentPointIndex] && (
-              <div className="current-coordinate">
-                現在の座標: {pathData.pathData[currentPointIndex].latitude.toFixed(6)}, {pathData.pathData[currentPointIndex].longitude.toFixed(6)}
-              </div>
-            )}
-          </div>
-        )}
-        
-        <div className="current-location-text">
-          {pathData ? 
-            `座標データ使用中 (${pathData.pathData.length}地点)` : 
-            'データが設定されていません'
-          }
+      {/* クイックアクション */}
+      <div className="quick-actions">
+        <h3>クイックアクション</h3>
+        <div className="action-buttons">
+          <Link to="/panorama" className="action-button panorama-btn">
+            360度パノラマを見る
+          </Link>
+          <Link to="/vr-panorama" className="action-button vr-btn">
+            VRパノラマを見る
+          </Link>
         </div>
       </div>
     </div>
