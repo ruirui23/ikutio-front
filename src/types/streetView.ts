@@ -1,6 +1,22 @@
 import * as THREE from 'three';
 
 /**
+ * パス上の座標点のインターフェース
+ */
+export interface PathPoint {
+    latitude: number;
+    longitude: number;
+    timestamp: string;
+}
+
+/**
+ * パスデータのインターフェース
+ */
+export interface PathData {
+    pathData: PathPoint[];
+}
+
+/**
  * Street View API設定のインターフェース
  */
 export interface StreetViewConfig {
@@ -16,4 +32,8 @@ export interface StreetViewConfig {
 export interface TextureLoadResult {
     texture: THREE.Texture | THREE.CanvasTexture;
     isFromApi: boolean;
+    coordinate?: {
+        latitude: number;
+        longitude: number;
+    };
 }

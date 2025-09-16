@@ -1,40 +1,11 @@
-import React, { useState,} from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text } from '@react-three/drei';
+import { useState } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
 import { PanoramaSphere } from './components/PanoramaSphere';
+import { DebugInfo } from './components/DebugInfo';
+import type { PathData } from './types/streetView';
 import './styles/Basic3DScene.css';
-
-function CameraInfo() {
-  const { camera } = useThree();
-  const [position, setPosition] = useState<number[]>([0, 0, 0]);
-  const [rotation, setRotation] = useState<number[]>([0, 0, 0]);
-  
-  useFrame(() => {
-    setPosition([
-      Math.round(camera.position.x * 100) / 100,
-      Math.round(camera.position.y * 100) / 100,
-      Math.round(camera.position.z * 100) / 100
-    ]);
-    setRotation([
-      Math.round(camera.rotation.x * 100) / 100,
-      Math.round(camera.rotation.y * 100) / 100,
-      Math.round(camera.rotation.z * 100) / 100
-    ]);
-  });
-  
-  return (
-    <Text
-      position={[0, 10, -20]}
-      fontSize={2}
-      color="white"
-      anchorX="center"
-      anchorY="middle"
-    >
-      {`Position: ${position.join(', ')}\nRotation: ${rotation.join(', ')}`}
-    </Text>
-  );
-}
 
 // XRストアを作成
 const xrStore = createXRStore({
@@ -49,16 +20,40 @@ const xrStore = createXRStore({
 });
 
 export default function Basic3DScene() {
-  const [location, setLocation] = useState<string>('Shibuya Crossing, Tokyo');
-  const [inputLocation, setInputLocation] = useState<string>('Shibuya Crossing, Tokyo');
+  const [pathData, setPathData] = useState<PathData | null>(null);
+  const [currentPointIndex, setCurrentPointIndex] = useState<number>(0);
+  const [inputPathData, setInputPathData] = useState<string>('');
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   
-  // ログは一度だけ出力
-  React.useEffect(() => {
-    console.log('App initialized. API Key:', apiKey ? '✅ Available' : '❌ Missing');
-  }, []);
-
+  const handlePathDataSubmit = () => {
+    try {
+      const parsedData: PathData = JSON.parse(inputPathData);
+      if (parsedData.pathData && Array.isArray(parsedData.pathData)) {
+        setPathData(parsedData);
+        setCurrentPointIndex(0);
+      } else {
+        alert('pathDataの形式が正しくありません');
+      }
+    } catch (error) {
+      alert('無効なJSON形式です');
+    }
+  };
+  
+  // サンプルデータを設定する関数
+  const loadSampleData = () => {
+    const sampleData: PathData = {
+      pathData: [
+        { latitude: 35.4122, longitude: 139.4130, timestamp: "2025-09-16T05:31:50Z" },
+        { latitude: 33.8815906, longitude: 130.8789872, timestamp: "2025-09-16T05:32:10Z" },
+        { latitude: 33.8815732, longitude: 130.8789877, timestamp: "2025-09-16T05:32:29Z" }
+      ]
+    };
+    setPathData(sampleData);
+    setCurrentPointIndex(0);
+    setInputPathData(JSON.stringify(sampleData, null, 2));
+  };
+  
   return (
     <div className="basic3d-scene-container">
       {/* VRボタン */}
@@ -76,24 +71,76 @@ export default function Basic3DScene() {
         </div>
       </div>
 
-      {/* 場所変更UI */}
+      {/* 座標データ入力UI */}
       <div className="location-controls-container">
-        <h3 className="location-controls-title"> 場所を変更</h3>
-        <input
-          type="text"
-          value={inputLocation}
-          onChange={(e) => setInputLocation(e.target.value)}
-          placeholder="場所を入力（例: Shibuya Crossing, Tokyo）"
-          className="location-input"
-        />
-        <button
-          onClick={() => setLocation(inputLocation)}
-          className="location-submit-button"
-        >
-          移動
-        </button>
+        <h3 className="location-controls-title">座標データを設定</h3>
+        
+        {/* pathData入力 */}
+        <div className="path-data-input-group">
+          <h4>座標データ (JSON形式)</h4>
+          <textarea
+            value={inputPathData}
+            onChange={(e) => setInputPathData(e.target.value)}
+            placeholder='{"pathData": [{"latitude": 33.881582, "longitude": 130.8789885, "timestamp": "2025-09-16T05:31:50Z"}]}'
+            className="path-data-textarea"
+            rows={4}
+          />
+          <div className="path-data-buttons">
+            <button onClick={handlePathDataSubmit} className="path-data-submit-button">
+              座標データを設定
+            </button>
+            <button onClick={loadSampleData} className="sample-data-button">
+              サンプルデータを読み込み
+            </button>
+            <button
+              onClick={() => {
+                setPathData(null);
+                setInputPathData('');
+                setCurrentPointIndex(0);
+              }}
+              className="clear-data-button"
+            >
+              クリア
+            </button>
+          </div>
+        </div>
+        
+        {/* ナビゲーションコントロール */}
+        {pathData && pathData.pathData && pathData.pathData.length > 1 && (
+          <div className="navigation-controls">
+            <h4>ナビゲーション</h4>
+            <div className="navigation-buttons">
+              <button
+                onClick={() => setCurrentPointIndex(Math.max(0, currentPointIndex - 1))}
+                disabled={currentPointIndex === 0}
+                className="nav-button prev-button"
+              >
+                ← 前の地点
+              </button>
+              <span className="point-indicator">
+                {currentPointIndex + 1} / {pathData.pathData.length}
+              </span>
+              <button
+                onClick={() => setCurrentPointIndex(Math.min(pathData.pathData.length - 1, currentPointIndex + 1))}
+                disabled={currentPointIndex === pathData.pathData.length - 1}
+                className="nav-button next-button"
+              >
+                次の地点 →
+              </button>
+            </div>
+            {pathData.pathData[currentPointIndex] && (
+              <div className="current-coordinate">
+                現在の座標: {pathData.pathData[currentPointIndex].latitude.toFixed(6)}, {pathData.pathData[currentPointIndex].longitude.toFixed(6)}
+              </div>
+            )}
+          </div>
+        )}
+        
         <div className="current-location-text">
-          現在: {location}
+          {pathData ? 
+            `座標データ使用中 (${pathData.pathData.length}地点)` : 
+            'データが設定されていません'
+          }
         </div>
       </div>
       
@@ -106,8 +153,17 @@ export default function Basic3DScene() {
           {/* VR環境でのユーザー位置を中心に設定 */}
           <XROrigin position={[0, 0, 0]} />
           <ambientLight intensity={1} />
-          <PanoramaSphere location={location} apiKey={apiKey} />
-          <CameraInfo />
+          <PanoramaSphere 
+            pathData={pathData || undefined}
+            currentPointIndex={currentPointIndex}
+            apiKey={apiKey} 
+          />
+          <DebugInfo
+            apiKey={apiKey}
+            pathData={pathData}
+            currentPointIndex={currentPointIndex}
+            visible={true}
+          />
           {/* VR環境では OrbitControls は自動的に無効化される */}
           <OrbitControls
             enablePan={true}

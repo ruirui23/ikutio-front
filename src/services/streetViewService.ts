@@ -68,10 +68,11 @@ export class StreetViewService {
     }
 
     /**
-     * Street View APIからテクスチャを取得
+     * 緯度・経度の座標からStreet View APIのテクスチャを取得
      */
-    static loadStreetViewTexture(
-        location: string,
+    static loadStreetViewTextureFromCoordinates(
+        latitude: number,
+        longitude: number,
         apiKey: string,
         config: StreetViewConfig = {}
     ): Promise<TextureLoadResult> {
@@ -83,6 +84,8 @@ export class StreetViewService {
                 pitch = 0
             } = config;
 
+            // 緯度,経度の形式でURLを構築
+            const location = `${latitude},${longitude}`;
             const url = `https://maps.googleapis.com/maps/api/streetview?size=${size}&location=${encodeURIComponent(location)}&heading=${heading}&pitch=${pitch}&fov=${fov}&key=${apiKey}`;
 
             const loader = new THREE.TextureLoader();
@@ -97,7 +100,8 @@ export class StreetViewService {
 
                     resolve({
                         texture: loadedTexture,
-                        isFromApi: true
+                        isFromApi: true,
+                        coordinate: { latitude, longitude }
                     });
                 },
                 (progress) => {
@@ -110,7 +114,8 @@ export class StreetViewService {
                     const testTexture = StreetViewService.createTestTexture();
                     resolve({
                         texture: testTexture,
-                        isFromApi: false
+                        isFromApi: false,
+                        coordinate: { latitude, longitude }
                     });
                 }
             );
@@ -118,21 +123,22 @@ export class StreetViewService {
     }
 
     /**
-     * ロケーションとAPIキーに基づいてテクスチャを取得
-     * APIキーが無効または空の場合はテストテクスチャを返します
+     * 座標データからテクスチャを取得（メインメソッド）
      */
-    static async getTexture(
-        location?: string,
+    static async getTextureFromCoordinates(
+        latitude: number,
+        longitude: number,
         apiKey?: string,
         config?: StreetViewConfig
     ): Promise<TextureLoadResult> {
-        if (!location || !apiKey || apiKey.trim() === '') {
+        if (!apiKey || apiKey.trim() === '') {
             return {
                 texture: StreetViewService.createTestTexture(),
-                isFromApi: false
+                isFromApi: false,
+                coordinate: { latitude, longitude }
             };
         }
 
-        return StreetViewService.loadStreetViewTexture(location, apiKey, config);
+        return StreetViewService.loadStreetViewTextureFromCoordinates(latitude, longitude, apiKey, config);
     }
 }
