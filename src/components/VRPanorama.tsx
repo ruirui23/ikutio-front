@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { StreetViewService } from '../services/streetViewService';
 import { Panorama360Sphere } from './Panorama360Sphere';
 import type { TextureLoadResult, PathData } from '../types/streetView';
+import '../styles/VRPanorama.css';
 
 interface VRPanoramaProps {
   /** パスデータ */
@@ -163,46 +164,17 @@ export function VRPanorama({
   return (
     <div className="vr-panorama-container" style={{ position: 'relative' }}>
       {/* VRコントロールパネル */}
-      <div 
-        className="vr-panorama-controls"
-        style={{
-          position: 'absolute',
-          top: 10,
-          left: 10,
-          zIndex: 1000,
-          display: 'flex',
-          gap: '10px',
-          flexDirection: 'column'
-        }}
-      >
+      <div className="vr-panorama-controls">
         <button
           onClick={() => xrStore.enterVR()}
           disabled={!isVRSupported}
-          style={{
-            padding: '12px 20px',
-            backgroundColor: isVRSupported ? 'rgba(0, 150, 0, 0.8)' : 'rgba(100, 100, 100, 0.8)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: isVRSupported ? 'pointer' : 'not-allowed',
-            fontSize: '16px',
-            fontWeight: 'bold'
-          }}
+          className={`vr-enter-button ${isVRSupported ? 'vr-enter-button--supported' : 'vr-enter-button--unsupported'}`}
         >
           {isVRSupported ? 'VR体験開始' : 'VR未対応'}
         </button>
         
         {!isVRSupported && (
-          <div
-            style={{
-              backgroundColor: 'rgba(255, 150, 0, 0.8)',
-              color: 'white',
-              padding: '8px',
-              borderRadius: '4px',
-              fontSize: '12px',
-              maxWidth: '200px'
-            }}
-          >
+          <div className="vr-unsupported-message">
             VRヘッドセット (Quest, Vive等) を接続してください
           </div>
         )}
@@ -210,20 +182,7 @@ export function VRPanorama({
 
       {/* 座標情報表示 */}
       {pathData && pathData.pathData && pathData.pathData.length > 0 && (
-        <div
-          className="vr-panorama-info"
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            left: 10,
-            zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
-            padding: '12px',
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
-        >
+        <div className="vr-panorama-info">
           <div><strong>VR 360°パノラマ</strong></div>
           座標: {pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)].latitude.toFixed(6)}, {pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)].longitude.toFixed(6)}
           <br />
@@ -232,21 +191,7 @@ export function VRPanorama({
       )}
 
       {/* VR操作説明 */}
-      <div
-        className="vr-panorama-help"
-        style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          padding: '12px',
-          borderRadius: '6px',
-          fontSize: '12px',
-          maxWidth: '250px'
-        }}
-      >
+      <div className="vr-panorama-help">
         <div><strong>VR操作方法:</strong></div>
         <div>• VRヘッドセットで頭を動かして360°確認</div>
         <div>• コントローラーでポイント操作</div>
@@ -254,13 +199,7 @@ export function VRPanorama({
       </div>
 
       {/* 3DキャンバスwithVR */}
-      <div
-        style={{
-          height: height,
-          width: '100%',
-          backgroundColor: '#000000'
-        }}
-      >
+      <div className="vr-panorama-canvas" style={{ height: height }}>
         <Canvas
           camera={{
             position: [0, 0, 0],

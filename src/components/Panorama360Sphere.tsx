@@ -1,7 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
+import  { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { TextureLoader } from 'three';
+import '../styles/Panorama360Sphere.css';
 
 interface Panorama360SphereProps {
   /** パノラマ画像のURL */
@@ -41,7 +42,7 @@ export function Panorama360Sphere({
     const canvas = document.createElement('canvas');
     const size = 1024;
     canvas.width = size;
-    canvas.height = size / 2; // 2:1のアスペクト比（360度パノラマ）
+    canvas.height = size / 2; 
     
     const context = canvas.getContext('2d');
     if (!context) return null;
@@ -107,7 +108,6 @@ export function Panorama360Sphere({
       loader.load(
         imageUrl,
         (loadedTexture) => {
-          // パノラマ画像として設定
           loadedTexture.mapping = THREE.EquirectangularReflectionMapping;
           loadedTexture.wrapS = THREE.RepeatWrapping;
           loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
@@ -142,7 +142,6 @@ export function Panorama360Sphere({
     }
   }, [imageUrl]);
 
-  // 初期回転を設定
   useEffect(() => {
     if (meshRef.current) {
       meshRef.current.rotation.y = initialRotationY;
@@ -150,23 +149,22 @@ export function Panorama360Sphere({
     }
   }, [initialRotationY, initialRotationX]);
 
-  // 自動回転
   useFrame((state, delta) => {
     if (autoRotate && meshRef.current) {
-      meshRef.current.rotation.y += autoRotateSpeed * delta * 60; // 60fps基準
+      meshRef.current.rotation.y += autoRotateSpeed * delta * 60; 
     }
   });
 
   if (loading) {
-    return null; // ローディング中は何も表示しない
+    return null;
   }
 
   return (
-    <mesh ref={meshRef} scale={[-1, 1, 1]}> {/* X軸を反転して内側から見えるように */}
+    <mesh ref={meshRef} scale={[-1, 1, 1]}> 
       <sphereGeometry args={[radius, widthSegments, heightSegments]} />
       <meshBasicMaterial
         map={texture}
-        side={THREE.BackSide} // 内側から見えるように
+        side={THREE.BackSide} 
         transparent={false}
       />
     </mesh>

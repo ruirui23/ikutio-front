@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { StreetViewService } from '../services/streetViewService';
 import { Panorama360Sphere } from './Panorama360Sphere';
 import type { TextureLoadResult, PathData } from '../types/streetView';
+import '../styles/InteractivePanorama.css';
 
 interface InteractivePanoramaProps {
   /** パスデータ */
@@ -23,20 +24,19 @@ interface InteractivePanoramaProps {
   vrSupport?: boolean;
 }
 
-// カメラコンポーネント（パノラマの中心に配置）
+// カメラコンポーネント
 function PanoramaCamera() {
   const { camera } = useThree();
   
   useEffect(() => {
-    // カメラを球体の中心に配置
     camera.position.set(0, 0, 0);
-    camera.lookAt(1, 0, 0); // 東向きを初期方向とする
+    camera.lookAt(1, 0, 0); 
   }, [camera]);
 
   return null;
 }
 
-// パノラマローダーコンポーネント
+// パノラマローダー
 function PanoramaLoader({ 
   pathData, 
   currentPointIndex = 0, 
@@ -64,7 +64,6 @@ function PanoramaLoader({
       );
       
       if (result.texture instanceof THREE.CanvasTexture) {
-        // CanvasTextureの場合は、data URLとして設定
         const canvas = result.texture.image as HTMLCanvasElement;
         if (canvas && canvas.toDataURL) {
           setPanoramaUrl(canvas.toDataURL());
@@ -156,44 +155,17 @@ export function InteractivePanorama({
   return (
     <div className="interactive-panorama-container" style={{ position: 'relative' }}>
       {/* コントロールパネル */}
-      <div 
-        className="panorama-controls"
-        style={{
-          position: 'absolute',
-          top: 10,
-          left: 10,
-          zIndex: 1000,
-          display: 'flex',
-          gap: '10px',
-          flexWrap: 'wrap'
-        }}
-      >
+      <div className="panorama-controls">
         <button
           onClick={toggleFullscreen}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
+          className="panorama-control-button panorama-control-button--fullscreen"
         >
           {isFullscreen ? '通常表示' : 'フルスクリーン'}
         </button>
         
         <button
           onClick={() => setControlsEnabled(!controlsEnabled)}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: controlsEnabled ? 'rgba(0, 150, 0, 0.7)' : 'rgba(150, 0, 0, 0.7)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
+          className={`panorama-control-button ${controlsEnabled ? 'panorama-control-button--controls-enabled' : 'panorama-control-button--controls-disabled'}`}
         >
           {controlsEnabled ? '操作ON' : '操作OFF'}
         </button>
@@ -201,20 +173,7 @@ export function InteractivePanorama({
 
       {/* 座標情報表示 */}
       {pathData && pathData.pathData && pathData.pathData.length > 0 && (
-        <div
-          className="panorama-info"
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            left: 10,
-            zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}
-        >
+        <div className="panorama-info">
           座標: {pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)].latitude.toFixed(6)}, {pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)].longitude.toFixed(6)}
           <br />
           地点: {currentPointIndex + 1} / {pathData.pathData.length}
@@ -222,21 +181,7 @@ export function InteractivePanorama({
       )}
 
       {/* 操作説明 */}
-      <div
-        className="panorama-help"
-        style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          maxWidth: '200px'
-        }}
-      >
+      <div className="panorama-help">
         <div><strong>操作方法:</strong></div>
         <div>• マウスドラッグ: 視点回転</div>
         <div>• スクロール: ズーム</div>
@@ -246,11 +191,8 @@ export function InteractivePanorama({
       {/* 3Dキャンバス */}
       <div
         ref={canvasRef}
-        style={{
-          height: isFullscreen ? '100vh' : height,
-          width: '100%',
-          backgroundColor: '#000000'
-        }}
+        className={`panorama-canvas-container ${isFullscreen ? 'panorama-canvas-container--fullscreen' : 'panorama-canvas-container--normal'}`}
+        style={{ height: isFullscreen ? '100vh' : height }}
       >
         <Canvas
           camera={{
@@ -275,7 +217,7 @@ export function InteractivePanorama({
           {/* インタラクティブコントロール */}
           <OrbitControls
             enabled={controlsEnabled}
-            enablePan={false} // パンを無効化（パノラマでは中心から動かない）
+            enablePan={false} 
             enableZoom={true}
             enableRotate={true}
             target={[0, 0, 0]}

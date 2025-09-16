@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { InteractivePanorama } from '../components/InteractivePanorama';
 import { VRPanorama } from '../components/VRPanorama';
 import type { PathData } from '../types/streetView';
-import '../styles/Basic3DScene.css';
+import '../styles/MapPage.css';
 
 export default function Map() {
   const [pathData, setPathData] = useState<PathData | null>(null);

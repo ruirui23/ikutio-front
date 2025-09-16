@@ -1,4 +1,5 @@
 import { Text } from '@react-three/drei';
+import '../styles/StatusDisplay.css';
 
 interface StatusDisplayProps {
   loading?: boolean;

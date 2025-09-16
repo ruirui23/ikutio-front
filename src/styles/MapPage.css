@@ -1,4 +1,6 @@
-/* Basic3DScene.css - Basic3DSceneコンポーネント用スタイル */
+/* MapPage.css - map.tsx用スタイル */
+
+/* Basic3DScene.cssと重複するため、Basic3DScene.cssの内容をこちらに統合 */
 
 /* メインコンテナ */
 .basic3d-scene-container {
@@ -73,51 +75,6 @@
   text-align: center;
 }
 
-/* VR体験UI - 右上のコンテナ */
-.vr-controls-container {
-  position: absolute;
-  top: 10px;
-  right: 120px;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 15px;
-  border-radius: 8px;
-  z-index: 1001;
-  max-width: 250px;
-}
-
-.vr-controls-title {
-  margin: 0 0 10px 0;
-  color: #4ECDC4;
-}
-
-.vr-enter-button {
-  width: 100%;
-  padding: 12px 15px;
-  background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.vr-enter-button:hover {
-  opacity: 0.9;
-}
-
-.vr-help-text {
-  margin-top: 8px;
-  font-size: 11px;
-  opacity: 0.8;
-  line-height: 1.3;
-}
-
 /* 場所変更UI - 左上のコンテナ */
 .location-controls-container {
   position: absolute;
@@ -136,44 +93,6 @@
 .location-controls-title {
   margin: 0 0 10px 0;
   color: #4CAF50;
-}
-
-/* 場所入力グループ */
-.location-input-group {
-  margin-bottom: 15px;
-}
-
-.location-input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  border: none;
-  box-sizing: border-box;
-}
-
-.location-input:disabled {
-  background: #555;
-  color: #aaa;
-}
-
-.location-submit-button {
-  width: 100%;
-  padding: 8px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.location-submit-button:hover:not(:disabled) {
-  background: #45a049;
-}
-
-.location-submit-button:disabled {
-  background: #555;
-  cursor: not-allowed;
 }
 
 /* pathData入力グループ */
@@ -306,76 +225,4 @@
   margin-top: 10px;
   font-size: 12px;
   opacity: 0.8;
-}
-
-/* Canvas背景（念のため追加） */
-.basic3d-canvas {
-  background: #000;
-}
-
-/* MultiHeadingStreetView用のスタイル */
-.multi-heading-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.multi-heading-grid {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-}
-
-.heading-preview {
-  width: 120px;
-  height: 80px;
-  border: 2px solid #4ECDC4;
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.5);
-  position: relative;
-}
-
-.heading-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.heading-label {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  text-align: center;
-  padding: 2px 4px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.heading-preview.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #4ECDC4;
-  font-size: 12px;
-}
-
-.heading-preview.error {
-  border-color: #f44336;
-  color: #f44336;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  text-align: center;
-  padding: 4px;
 }

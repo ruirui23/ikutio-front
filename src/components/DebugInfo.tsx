@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import type { PathData } from '../types/streetView';
+import '../styles/DebugInfo.css';
 
 interface DebugInfoProps {
   apiKey?: string;
