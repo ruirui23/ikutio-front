@@ -37,41 +37,6 @@ export function Panorama360Sphere({
     context.fillStyle = gradient;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // グリッドパターン
-    context.strokeStyle = '#FFFFFF';
-    context.lineWidth = 2;
-    context.globalAlpha = 0.3;
-
-    // 縦線
-    for (let x = 0; x < canvas.width; x += canvas.width / 8) {
-      context.beginPath();
-      context.moveTo(x, 0);
-      context.lineTo(x, canvas.height);
-      context.stroke();
-    }
-
-    // 横線
-    for (let y = 0; y < canvas.height; y += canvas.height / 4) {
-      context.beginPath();
-      context.moveTo(0, y);
-      context.lineTo(canvas.width, y);
-      context.stroke();
-    }
-
-    // テキストラベル
-    context.globalAlpha = 1;
-    context.fillStyle = '#FFFFFF';
-    context.font = '48px Arial';
-    context.textAlign = 'center';
-    context.fillText('360° パノラマテスト', canvas.width / 2, canvas.height / 2);
-
-    // 方角ラベル
-    context.font = '32px Arial';
-    context.fillText('北', canvas.width / 2, 60);
-    context.fillText('南', canvas.width / 2, canvas.height - 30);
-    context.fillText('東', canvas.width - 50, canvas.height / 2);
-    context.fillText('西', 50, canvas.height / 2);
-
     const testTexture = new THREE.CanvasTexture(canvas);
     testTexture.mapping = THREE.EquirectangularReflectionMapping;
     testTexture.wrapS = THREE.RepeatWrapping;
