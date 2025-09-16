@@ -1,0 +1,43 @@
+/* メインコンテナ */
+.vr-counter-display {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 1000;
+  max-width: 450px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* カウント表示行 */
+.vr-counter-count-row {
+  margin-bottom: 10px;
+}
+
+/* 左手カウンター */
+.vr-counter-left {
+  color: #ff6b6b;
+}
+
+/* 右手カウンター */
+.vr-counter-right {
+  color: #4ecdc4;
+}
+
+/* 総計表示 */
+.vr-counter-total {
+  font-size: 16px;
+  color: #ffd93d;
+  margin-bottom: 10px;
+}
+
+/* 説明テキスト */
+.vr-counter-instruction {
+  font-size: 14px;
+  opacity: 0.9;
+}
