@@ -1,4 +1,5 @@
 import type { User } from './types/user.ts';
+import SimpleLocationsOnce from './components/SimpleLocationsOnce';
 
 interface HomeScreenProps {
   user: User | null;
@@ -19,6 +20,8 @@ export default function HomeScreen({ user, onStartGame, onLogout, onStartVRDemo 
       alignItems: 'center',
       color: 'white'
     }}>
+      {/* 一度だけJSONを取得してログへ出す（邪魔にならない Headless） */}
+      <SimpleLocationsOnce />
       {/* ヘッダー */}
       <div style={{
         position: 'absolute',
