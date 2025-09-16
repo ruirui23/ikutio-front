@@ -3,25 +3,9 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Panorama360Sphere } from './Panorama360Sphere';
 import { usePanoramaLoader } from '../hooks/usePanoramaLoader';
+import type { InteractivePanoramaProps } from '../types/components';
 import type { PathData } from '../types/streetView';
 import '../styles/InteractivePanorama.css';
-
-interface InteractivePanoramaProps {
-  /** パスデータ */
-  pathData?: PathData;
-  /** 現在のポイントインデックス */
-  currentPointIndex?: number;
-  /** Google Maps API Key */
-  apiKey?: string;
-  /** キャンバスの高さ */
-  height?: string;
-  /** 自動回転の有効/無効 */
-  autoRotate?: boolean;
-  /** 自動回転速度 */
-  autoRotateSpeed?: number;
-  /** VRサポート */
-  vrSupport?: boolean;
-}
 
 // カメラコンポーネント
 function PanoramaCamera() {

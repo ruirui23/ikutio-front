@@ -1,12 +1,6 @@
 import { Text } from '@react-three/drei';
+import type { StatusDisplayProps } from '../types/components';
 import '../styles/StatusDisplay.css';
-
-interface StatusDisplayProps {
-  loading?: boolean;
-  error?: string | null;
-  loadingMessage?: string;
-  position?: [number, number, number];
-}
 
 export function StatusDisplay({ 
   loading = false, 

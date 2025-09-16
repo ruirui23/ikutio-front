@@ -1,15 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import type { PathData } from '../types/streetView';
+import type { DebugInfoProps } from '../types/components';
 import '../styles/DebugInfo.css';
-
-interface DebugInfoProps {
-  apiKey?: string;
-  pathData?: PathData | null;
-  currentPointIndex?: number;
-  visible?: boolean;
-}
 
 export function DebugInfo({ 
   apiKey, 
@@ -34,12 +27,10 @@ export function DebugInfo({
     ]);
   });
 
-  // APIキーの状態をログ出力
   useEffect(() => {
-    console.log('🔑 API Key Status:', apiKey ? '✅ Available' : '❌ Missing');
     if (pathData) {
-      console.log('🗺️ PathData:', pathData.pathData.length, 'points loaded');
-      console.log('📌 Current Point:', pathData.pathData[currentPointIndex]);
+      console.log('PathData:', pathData.pathData.length, 'points loaded');
+      console.log('Current Point:', pathData.pathData[currentPointIndex]);
     }
   }, [apiKey, pathData, currentPointIndex]);
 
@@ -57,7 +48,7 @@ export function DebugInfo({
   const debugText = `=== DEBUG INFO ===
 Camera Pos: ${cameraPosition.join(', ')}
 Camera Rot: ${cameraRotation.join(', ')}
-API Key: ${apiKey ? '✅ OK' : '❌ Missing'}
+API Key: ${apiKey ? 'OK' : ' Missing'}
 Current: ${getCurrentCoordinate()}
 ${pathData ? `PathData: ${pathData.pathData.length} points (${currentPointIndex + 1}/${pathData.pathData.length})` : 'データ未設定'}`;
 

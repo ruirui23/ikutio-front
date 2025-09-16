@@ -2,25 +2,8 @@ import  { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { TextureLoader } from 'three';
+import type { Panorama360SphereProps } from '../types/components';
 import '../styles/Panorama360Sphere.css';
-
-interface Panorama360SphereProps {
-  /** パノラマ画像のURL */
-  imageUrl?: string;
-  /** 球体の半径 */
-  radius?: number;
-  /** 球体の分割数（詳細度） */
-  widthSegments?: number;
-  heightSegments?: number;
-  /** カメラの初期回転角度（Y軸回転、ラジアン） */
-  initialRotationY?: number;
-  /** カメラの初期回転角度（X軸回転、ラジアン） */
-  initialRotationX?: number;
-  /** 自動回転の有効/無効 */
-  autoRotate?: boolean;
-  /** 自動回転速度 */
-  autoRotateSpeed?: number;
-}
 
 export function Panorama360Sphere({
   imageUrl,
