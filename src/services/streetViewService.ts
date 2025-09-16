@@ -1,16 +1,5 @@
 import * as THREE from 'three';
-
-export interface StreetViewConfig {
-    size?: string;
-    fov?: number;
-    heading?: number;
-    pitch?: number;
-}
-
-export interface TextureLoadResult {
-    texture: THREE.Texture | THREE.CanvasTexture;
-    isFromApi: boolean;
-}
+import type { StreetViewConfig, TextureLoadResult } from '../types/streetView';
 
 export class StreetViewService {
     /**

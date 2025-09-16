@@ -1,7 +1,8 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { StreetViewService, type TextureLoadResult } from '../services/streetViewService';
+import { StreetViewService } from '../services/streetViewService';
+import type { TextureLoadResult } from '../types/streetView';
 
 interface PanoramaSphereProps {
   location?: string;
