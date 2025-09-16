@@ -1,7 +1,7 @@
-import Demo from './pages/demo';
+import Map from './pages/map';
 
 function App() {
-  return <Demo />;
+  return <Map />;
 }
 
 export default App;
