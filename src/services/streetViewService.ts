@@ -68,6 +68,61 @@ export class StreetViewService {
     }
 
     /**
+     * 緯度・経度の座標からStreet View APIのテクスチャを取得
+     */
+    static loadStreetViewTextureFromCoordinates(
+        latitude: number,
+        longitude: number,
+        apiKey: string,
+        config: StreetViewConfig = {}
+    ): Promise<TextureLoadResult> {
+        return new Promise((resolve) => {
+            const {
+                size = '1024x512',
+                fov = 120,
+                heading = 0,
+                pitch = 0
+            } = config;
+
+            // 緯度,経度の形式でURLを構築
+            const location = `${latitude},${longitude}`;
+            const url = `https://maps.googleapis.com/maps/api/streetview?size=${size}&location=${encodeURIComponent(location)}&heading=${heading}&pitch=${pitch}&fov=${fov}&key=${apiKey}`;
+
+            const loader = new THREE.TextureLoader();
+            loader.load(
+                url,
+                (loadedTexture) => {
+                    loadedTexture.mapping = THREE.UVMapping;
+                    loadedTexture.wrapS = THREE.RepeatWrapping;
+                    loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
+                    loadedTexture.flipY = false;
+                    loadedTexture.needsUpdate = true;
+
+                    resolve({
+                        texture: loadedTexture,
+                        isFromApi: true,
+                        coordinate: { latitude, longitude }
+                    });
+                },
+                (progress) => {
+                    console.log('Loading progress:', progress);
+                },
+                (error) => {
+                    console.error('❌ Error loading Street View image:', error);
+
+                    // エラーが発生した場合はテストテクスチャを返す
+                    const testTexture = StreetViewService.createTestTexture();
+                    resolve({
+                        texture: testTexture,
+                        isFromApi: false,
+                        coordinate: { latitude, longitude }
+                    });
+                }
+            );
+        });
+    }
+
+    /**
      * Street View APIからテクスチャを取得
      */
     static loadStreetViewTexture(
@@ -134,5 +189,25 @@ export class StreetViewService {
         }
 
         return StreetViewService.loadStreetViewTexture(location, apiKey, config);
+    }
+
+    /**
+     * 座標データからテクスチャを取得
+     */
+    static async getTextureFromCoordinates(
+        latitude: number,
+        longitude: number,
+        apiKey?: string,
+        config?: StreetViewConfig
+    ): Promise<TextureLoadResult> {
+        if (!apiKey || apiKey.trim() === '') {
+            return {
+                texture: StreetViewService.createTestTexture(),
+                isFromApi: false,
+                coordinate: { latitude, longitude }
+            };
+        }
+
+        return StreetViewService.loadStreetViewTextureFromCoordinates(latitude, longitude, apiKey, config);
     }
 }
