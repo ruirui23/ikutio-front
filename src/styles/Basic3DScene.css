@@ -246,3 +246,70 @@
 .basic3d-canvas {
   background: #000;
 }
+
+/* MultiHeadingStreetView用のスタイル */
+.multi-heading-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.multi-heading-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.heading-preview {
+  width: 120px;
+  height: 80px;
+  border: 2px solid #4ECDC4;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.heading-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heading-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+  padding: 2px 4px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.heading-preview.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4ECDC4;
+  font-size: 12px;
+}
+
+.heading-preview.error {
+  border-color: #f44336;
+  color: #f44336;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  text-align: center;
+  padding: 4px;
+}

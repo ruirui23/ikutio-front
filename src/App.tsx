@@ -1,7 +1,7 @@
-import Basic3DScene from './Basic3DScene';
+import Demo from './pages/demo';
 
 function App() {
-  return <Basic3DScene />;
+  return <Demo />;
 }
 
 export default App;
