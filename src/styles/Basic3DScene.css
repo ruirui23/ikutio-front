@@ -7,6 +7,72 @@
   position: relative;
 }
 
+/* 表示モード切り替えUI */
+.view-mode-controls {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  z-index: 1002;
+  text-align: center;
+}
+
+.view-mode-title {
+  margin: 0 0 10px 0;
+  color: #4ECDC4;
+  font-size: 16px;
+}
+
+.view-mode-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.view-mode-button {
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.view-mode-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.view-mode-button.active {
+  background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+  border-color: white;
+}
+
+/* パノラマセクション */
+.panorama-section,
+.vr-panorama-section {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.panorama-section h3,
+.vr-panorama-section h3 {
+  color: #4ECDC4;
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
 /* VR体験UI - 右上のコンテナ */
 .vr-controls-container {
   position: absolute;

@@ -4,6 +4,8 @@ import { OrbitControls } from '@react-three/drei';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
 import { MultiHeadingStreetView } from '../components/MultiHeadingStreetView';
 import { DebugInfo } from '../components/DebugInfo';
+import { InteractivePanorama } from '../components/InteractivePanorama';
+import { VRPanorama } from '../components/VRPanorama';
 import type { PathData } from '../types/streetView';
 import '../styles/Basic3DScene.css';
 
@@ -23,6 +25,7 @@ export default function Demo() {
   const [pathData, setPathData] = useState<PathData | null>(null);
   const [currentPointIndex, setCurrentPointIndex] = useState<number>(0);
   const [inputPathData, setInputPathData] = useState<string>('');
+  const [viewMode, setViewMode] = useState<'original' | 'panorama' | 'vr-panorama'>('panorama');
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   
@@ -56,20 +59,112 @@ export default function Demo() {
   
   return (
     <div className="basic3d-scene-container">
-      {/* VRボタン */}
-      <div className="vr-controls-container">
-        <h4 className="vr-controls-title">VR体験</h4>
-        <button
-          onClick={() => xrStore.enterVR()}
-          className="vr-enter-button"
-        >
-          VRで360度体験
-        </button>
-        <div className="vr-help-text">
-          ※VRゴーグルが必要です<br/>
-          Meta Quest, Vive等に対応
+      {/* 表示モード切り替え */}
+      <div className="view-mode-controls">
+        <h4 className="view-mode-title">表示モード</h4>
+        <div className="view-mode-buttons">
+          <button
+            onClick={() => setViewMode('panorama')}
+            className={`view-mode-button ${viewMode === 'panorama' ? 'active' : ''}`}
+          >
+            360°パノラマ
+          </button>
+          <button
+            onClick={() => setViewMode('vr-panorama')}
+            className={`view-mode-button ${viewMode === 'vr-panorama' ? 'active' : ''}`}
+          >
+            VRパノラマ
+          </button>
+          <button
+            onClick={() => setViewMode('original')}
+            className={`view-mode-button ${viewMode === 'original' ? 'active' : ''}`}
+          >
+            オリジナル
+          </button>
         </div>
       </div>
+      
+      {/* 360度パノラマビューモード */}
+      {viewMode === 'panorama' && (
+        <div className="panorama-section">
+          <h3>360度パノラマビュー</h3>
+          <InteractivePanorama
+            pathData={pathData || undefined}
+            currentPointIndex={currentPointIndex}
+            apiKey={apiKey}
+            height="500px"
+            autoRotate={false}
+          />
+        </div>
+      )}
+
+      {/* VRパノラマビューモード */}
+      {viewMode === 'vr-panorama' && (
+        <div className="vr-panorama-section">
+          <h3>VR 360度パノラマビュー</h3>
+          <VRPanorama
+            pathData={pathData || undefined}
+            currentPointIndex={currentPointIndex}
+            apiKey={apiKey}
+            height="500px"
+            autoRotate={false}
+          />
+        </div>
+      )}
+
+      {/* オリジナルビューモード */}
+      {viewMode === 'original' && (
+        <>
+          {/* VRボタン */}
+          <div className="vr-controls-container">
+            <h4 className="vr-controls-title">VR体験</h4>
+            <button
+              onClick={() => xrStore.enterVR()}
+              className="vr-enter-button"
+            >
+              VRで360度体験
+            </button>
+            <div className="vr-help-text">
+              ※VRゴーグルが必要です<br/>
+              Meta Quest, Vive等に対応
+            </div>
+          </div>
+
+          <Canvas
+            camera={{ position: [0, 0, 0], fov: 75 }}
+            className="basic3d-canvas"
+            gl={{ antialias: true, alpha: false }}
+          >
+            <XR store={xrStore}>
+              {/* VR環境でのユーザー位置を中心に設定 */}
+              <XROrigin position={[0, 0, 0]} />
+              <ambientLight intensity={1} />
+              <MultiHeadingStreetView 
+                pathData={pathData || undefined}
+                currentPointIndex={currentPointIndex}
+                apiKey={apiKey}
+                headingOrder={[270,180, 90, 0]} // 任意の順番を指定可能
+                imageSize="640x640" // 最大解像度を指定
+              />
+              <DebugInfo
+                apiKey={apiKey}
+                pathData={pathData}
+                currentPointIndex={currentPointIndex}
+                visible={true}
+              />
+              {/* VR環境では OrbitControls は自動的に無効化される */}
+              <OrbitControls
+                enablePan={true}
+                enableZoom={true}
+                enableRotate={true}
+                target={[0, 0, 0]}
+                maxDistance={10}
+                minDistance={0.1}
+              />
+            </XR>
+          </Canvas>
+        </>
+      )}
 
       {/* 座標データ入力UI */}
       <div className="location-controls-container">
@@ -143,39 +238,6 @@ export default function Demo() {
           }
         </div>
       </div>
-      
-      <Canvas
-        camera={{ position: [0, 0, 0], fov: 75 }}
-        className="basic3d-canvas"
-        gl={{ antialias: true, alpha: false }}
-      >
-        <XR store={xrStore}>
-          {/* VR環境でのユーザー位置を中心に設定 */}
-          <XROrigin position={[0, 0, 0]} />
-          <ambientLight intensity={1} />
-          <MultiHeadingStreetView 
-            pathData={pathData || undefined}
-            currentPointIndex={currentPointIndex}
-            apiKey={apiKey}
-            headingOrder={[270,180, 90, 0]} // 任意の順番を指定可能
-          />
-          <DebugInfo
-            apiKey={apiKey}
-            pathData={pathData}
-            currentPointIndex={currentPointIndex}
-            visible={true}
-          />
-          {/* VR環境では OrbitControls は自動的に無効化される */}
-          <OrbitControls
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            target={[0, 0, 0]}
-            maxDistance={10}
-            minDistance={0.1}
-          />
-        </XR>
-      </Canvas>
     </div>
   );
 }

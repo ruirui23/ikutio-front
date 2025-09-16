@@ -9,6 +9,7 @@ interface MultiHeadingStreetViewProps {
   currentPointIndex?: number;
   apiKey?: string;
   headingOrder?: number[]; // 任意の順番を指定できるプロパティ
+  imageSize?: string; // 画像解像度を指定できるプロパティ（例: '640x640', '1024x512'）
 }
 
 interface ImageData {
@@ -22,7 +23,8 @@ export function MultiHeadingStreetView({
   pathData, 
   currentPointIndex = 0, 
   apiKey,
-  headingOrder = [0, 90, 180, 270] // デフォルト値を設定
+  headingOrder = [0, 90, 180, 270], // デフォルト値を設定
+  imageSize = '640x640' // 高解像度をデフォルトに設定
 }: MultiHeadingStreetViewProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [images, setImages] = useState<ImageData[]>(() => 
@@ -49,7 +51,7 @@ export function MultiHeadingStreetView({
             latitude, 
             longitude, 
             key, 
-            { heading: heading }
+            { heading: heading, size: imageSize }
           );
           
           return {
@@ -88,7 +90,7 @@ export function MultiHeadingStreetView({
         error: 'テクスチャの読み込み中にエラーが発生しました'
       })));
     }
-  }, [headingOrder]);
+  }, [headingOrder, imageSize]);
 
   React.useEffect(() => {
     if (pathData && pathData.pathData && pathData.pathData.length > 0) {
@@ -112,7 +114,7 @@ export function MultiHeadingStreetView({
         error: null
       })));
     }
-  }, [pathData, currentPointIndex, apiKey, loadTexturesFromCoordinates, lastCoordinate, headingOrder]);
+  }, [pathData, currentPointIndex, apiKey, loadTexturesFromCoordinates, lastCoordinate, headingOrder, imageSize]);
 
   // 各球体セクションのメッシュを更新
   React.useEffect(() => {
