@@ -1,6 +1,6 @@
 import  { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 import '../styles/Panorama360Sphere.css';
 
@@ -35,9 +35,7 @@ export function Panorama360Sphere({
   const meshRef = useRef<THREE.Mesh>(null);
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // デフォルトのテストテクスチャを作成
   const createTestTexture = () => {
     const canvas = document.createElement('canvas');
     const size = 1024;
@@ -47,11 +45,11 @@ export function Panorama360Sphere({
     const context = canvas.getContext('2d');
     if (!context) return null;
 
-    // グラデーション背景
+    // 背景
     const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#87CEEB'); // 空色
-    gradient.addColorStop(0.7, '#98FB98'); // 淡い緑
-    gradient.addColorStop(1, '#8FBC8F'); // 暗い緑
+    gradient.addColorStop(0, '#87CEEB'); 
+    gradient.addColorStop(0.7, '#98FB98');
+    gradient.addColorStop(1, '#8FBC8F'); 
 
     context.fillStyle = gradient;
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -101,7 +99,6 @@ export function Panorama360Sphere({
   // テクスチャのロード
   useEffect(() => {
     setLoading(true);
-    setError(null);
 
     if (imageUrl) {
       const loader = new TextureLoader();
@@ -122,7 +119,6 @@ export function Panorama360Sphere({
         },
         (err) => {
           console.error('Error loading texture:', err);
-          setError('画像の読み込みに失敗しました');
           
           // エラー時はテストテクスチャを使用
           const testTexture = createTestTexture();
@@ -149,7 +145,7 @@ export function Panorama360Sphere({
     }
   }, [initialRotationY, initialRotationX]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (autoRotate && meshRef.current) {
       meshRef.current.rotation.y += autoRotateSpeed * delta * 60; 
     }

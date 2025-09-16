@@ -1,10 +1,9 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
-import { StreetViewService } from '../services/streetViewService';
 import { Panorama360Sphere } from './Panorama360Sphere';
-import type { TextureLoadResult, PathData } from '../types/streetView';
+import { usePanoramaLoader } from '../hooks/usePanoramaLoader';
+import type { PathData } from '../types/streetView';
 import '../styles/InteractivePanorama.css';
 
 interface InteractivePanoramaProps {
@@ -50,46 +49,11 @@ function PanoramaLoader({
   autoRotate?: boolean;
   autoRotateSpeed?: number;
 }) {
-  const [panoramaUrl, setPanoramaUrl] = useState<string | undefined>();
-  const [loading, setLoading] = useState(true);
-
-  const loadPanorama = useCallback(async (latitude: number, longitude: number, key?: string) => {
-    setLoading(true);
-
-    try {
-      const result: TextureLoadResult = await StreetViewService.getPanoramaFromCoordinates(
-        latitude, 
-        longitude, 
-        key
-      );
-      
-      if (result.texture instanceof THREE.CanvasTexture) {
-        const canvas = result.texture.image as HTMLCanvasElement;
-        if (canvas && canvas.toDataURL) {
-          setPanoramaUrl(canvas.toDataURL());
-        }
-      }
-      
-      if (!result.isFromApi && key && key.trim() !== '') {
-        console.warn('Street View APIでの画像取得に失敗しました。テストパノラマを表示しています。');
-      }
-    } catch (err) {
-      console.error('Error loading panorama:', err);
-      console.warn('パノラマの読み込み中にエラーが発生しました。');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (pathData && pathData.pathData && pathData.pathData.length > 0) {
-      const currentPoint = pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)];
-      loadPanorama(currentPoint.latitude, currentPoint.longitude, apiKey);
-    } else {
-      // デフォルトの場所（東京駅）
-      loadPanorama(35.6812, 139.7671, apiKey);
-    }
-  }, [pathData, currentPointIndex, apiKey, loadPanorama]);
+  const { panoramaUrl, loading, error } = usePanoramaLoader({
+    pathData,
+    currentPointIndex,
+    apiKey
+  });
 
   return (
     <>
@@ -111,6 +75,14 @@ function PanoramaLoader({
           <meshBasicMaterial color="#333333" transparent opacity={0.8} />
         </mesh>
       )}
+      
+      {/* エラー表示 */}
+      {error && (
+        <mesh position={[0, 0, -1]}>
+          <planeGeometry args={[3, 1.5]} />
+          <meshBasicMaterial color="#ff3333" transparent opacity={0.8} />
+        </mesh>
+      )}
     </>
   );
 }
@@ -127,7 +99,6 @@ export function InteractivePanorama({
   const [controlsEnabled, setControlsEnabled] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // フルスクリーン切り替え
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       if (canvasRef.current?.requestFullscreen) {
@@ -141,8 +112,6 @@ export function InteractivePanorama({
       }
     }
   }, []);
-
-  // フルスクリーンイベントリスナー
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -179,15 +148,6 @@ export function InteractivePanorama({
           地点: {currentPointIndex + 1} / {pathData.pathData.length}
         </div>
       )}
-
-      {/* 操作説明 */}
-      <div className="panorama-help">
-        <div><strong>操作方法:</strong></div>
-        <div>• マウスドラッグ: 視点回転</div>
-        <div>• スクロール: ズーム</div>
-        <div>• フルスクリーン推奨</div>
-      </div>
-
       {/* 3Dキャンバス */}
       <div
         ref={canvasRef}

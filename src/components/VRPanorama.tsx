@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
-import * as THREE from 'three';
-import { StreetViewService } from '../services/streetViewService';
 import { Panorama360Sphere } from './Panorama360Sphere';
-import type { TextureLoadResult, PathData } from '../types/streetView';
+import { usePanoramaLoader } from '../hooks/usePanoramaLoader';
+import type { PathData } from '../types/streetView';
 import '../styles/VRPanorama.css';
 
 interface VRPanoramaProps {
@@ -22,7 +21,6 @@ interface VRPanoramaProps {
   autoRotateSpeed?: number;
 }
 
-// XRストアを作成
 const xrStore = createXRStore({
   controller: { 
     rayPointer: true,
@@ -34,26 +32,23 @@ const xrStore = createXRStore({
   foveation: 0.5,
 });
 
-// VR用カメラコンポーネント
 function VRPanoramaCamera() {
   const { camera } = useThree();
   
   useEffect(() => {
-    // VRではカメラを原点に配置
     camera.position.set(0, 0, 0);
-    camera.lookAt(1, 0, 0); // 東向きを初期方向とする
+    camera.lookAt(1, 0, 0); 
   }, [camera]);
 
   return null;
 }
 
-// VR用パノラマローダーコンポーネント
 function VRPanoramaLoader({ 
   pathData, 
   currentPointIndex = 0, 
   apiKey,
   autoRotate = false,
-  autoRotateSpeed = 0.002 // VRでは少し遅めに
+  autoRotateSpeed = 0.002
 }: {
   pathData?: PathData;
   currentPointIndex?: number;
@@ -61,65 +56,25 @@ function VRPanoramaLoader({
   autoRotate?: boolean;
   autoRotateSpeed?: number;
 }) {
-  const [panoramaUrl, setPanoramaUrl] = useState<string | undefined>();
-  const [loading, setLoading] = useState(true);
-
-  const loadPanorama = useCallback(async (latitude: number, longitude: number, key?: string) => {
-    setLoading(true);
-
-    try {
-      const result: TextureLoadResult = await StreetViewService.getPanoramaFromCoordinates(
-        latitude, 
-        longitude, 
-        key
-      );
-      
-      if (result.texture instanceof THREE.CanvasTexture) {
-        // CanvasTextureの場合は、data URLとして設定
-        const canvas = result.texture.image as HTMLCanvasElement;
-        if (canvas && canvas.toDataURL) {
-          setPanoramaUrl(canvas.toDataURL());
-        }
-      }
-      
-      if (!result.isFromApi && key && key.trim() !== '') {
-        console.warn('Street View APIでの画像取得に失敗しました。テストパノラマを表示しています。');
-      }
-    } catch (err) {
-      console.error('Error loading panorama:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (pathData && pathData.pathData && pathData.pathData.length > 0) {
-      const currentPoint = pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)];
-      loadPanorama(currentPoint.latitude, currentPoint.longitude, apiKey);
-    } else {
-      // デフォルトの場所（東京駅）
-      loadPanorama(35.6812, 139.7671, apiKey);
-    }
-  }, [pathData, currentPointIndex, apiKey, loadPanorama]);
+  const { panoramaUrl, loading, error } = usePanoramaLoader({
+    pathData,
+    currentPointIndex,
+    apiKey
+  });
 
   return (
     <>
       <VRPanoramaCamera />
-      <ambientLight intensity={1.2} /> {/* VRではやや明るめに */}
-      
-      {/* VR環境でのユーザー位置を中心に設定 */}
+      <ambientLight intensity={1.2} /> 
       <XROrigin position={[0, 0, 0]} />
-      
       <Panorama360Sphere
         imageUrl={panoramaUrl}
-        radius={50} // VRでは少し小さめの半径
-        widthSegments={64} // VRでは高品質
+        radius={50} 
+        widthSegments={64}
         heightSegments={32}
         autoRotate={autoRotate}
         autoRotateSpeed={autoRotateSpeed}
       />
-      
-      {/* ローディング表示（VR用） */}
       {loading && (
         <mesh position={[0, 0, -2]}>
           <planeGeometry args={[4, 2]} />
@@ -127,7 +82,13 @@ function VRPanoramaLoader({
         </mesh>
       )}
       
-      {/* VR用の座標情報表示（浮遊テキスト） */}
+      {error && (
+        <mesh position={[0, 1, -2]}>
+          <planeGeometry args={[4, 1]} />
+          <meshBasicMaterial color="#ff3333" transparent opacity={0.8} />
+        </mesh>
+      )}
+      
       {pathData && pathData.pathData && pathData.pathData.length > 0 && (
         <group position={[0, -1.5, -3]}>
           <mesh>
@@ -139,7 +100,6 @@ function VRPanoramaLoader({
     </>
   );
 }
-
 export function VRPanorama({
   pathData,
   currentPointIndex = 0,
@@ -148,56 +108,8 @@ export function VRPanorama({
   autoRotate = false,
   autoRotateSpeed = 0.002
 }: VRPanoramaProps) {
-  const [isVRSupported, setIsVRSupported] = useState(false);
-
-  // VRサポートチェック
-  useEffect(() => {
-    if ('xr' in navigator && navigator.xr) {
-      navigator.xr.isSessionSupported('immersive-vr').then((supported: boolean) => {
-        setIsVRSupported(supported);
-      }).catch(() => {
-        setIsVRSupported(false);
-      });
-    }
-  }, []);
-
   return (
     <div className="vr-panorama-container" style={{ position: 'relative' }}>
-      {/* VRコントロールパネル */}
-      <div className="vr-panorama-controls">
-        <button
-          onClick={() => xrStore.enterVR()}
-          disabled={!isVRSupported}
-          className={`vr-enter-button ${isVRSupported ? 'vr-enter-button--supported' : 'vr-enter-button--unsupported'}`}
-        >
-          {isVRSupported ? 'VR体験開始' : 'VR未対応'}
-        </button>
-        
-        {!isVRSupported && (
-          <div className="vr-unsupported-message">
-            VRヘッドセット (Quest, Vive等) を接続してください
-          </div>
-        )}
-      </div>
-
-      {/* 座標情報表示 */}
-      {pathData && pathData.pathData && pathData.pathData.length > 0 && (
-        <div className="vr-panorama-info">
-          <div><strong>VR 360°パノラマ</strong></div>
-          座標: {pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)].latitude.toFixed(6)}, {pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)].longitude.toFixed(6)}
-          <br />
-          地点: {currentPointIndex + 1} / {pathData.pathData.length}
-        </div>
-      )}
-
-      {/* VR操作説明 */}
-      <div className="vr-panorama-help">
-        <div><strong>VR操作方法:</strong></div>
-        <div>• VRヘッドセットで頭を動かして360°確認</div>
-        <div>• コントローラーでポイント操作</div>
-        <div>• 没入感のある体験をお楽しみください</div>
-      </div>
-
       {/* 3DキャンバスwithVR */}
       <div className="vr-panorama-canvas" style={{ height: height }}>
         <Canvas
