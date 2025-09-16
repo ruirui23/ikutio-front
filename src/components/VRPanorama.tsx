@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
 import { Panorama360Sphere } from './Panorama360Sphere';
+import { ControllerVisualizer, ControllerConnectionLine } from './VRControllerCounter';
 import { usePanoramaLoader } from '../hooks/usePanoramaLoader';
 import type { VRPanoramaProps } from '../types/components';
 import type { PathData } from '../types/streetView';
@@ -34,13 +35,15 @@ function VRPanoramaLoader({
   currentPointIndex = 0, 
   apiKey,
   autoRotate = false,
-  autoRotateSpeed = 0.002
+  autoRotateSpeed = 0.002,
+  showControllers = false
 }: {
   pathData?: PathData;
   currentPointIndex?: number;
   apiKey?: string;
   autoRotate?: boolean;
   autoRotateSpeed?: number;
+  showControllers?: boolean;
 }) {
   const { panoramaUrl, loading, error } = usePanoramaLoader({
     pathData,
@@ -53,6 +56,16 @@ function VRPanoramaLoader({
       <VRPanoramaCamera />
       <ambientLight intensity={1.2} /> 
       <XROrigin position={[0, 0, 0]} />
+      
+      {/* コントローラー表示 */}
+      {showControllers && (
+        <>
+          <ControllerVisualizer hand="left" />
+          <ControllerVisualizer hand="right" />
+          <ControllerConnectionLine />
+        </>
+      )}
+      
       <Panorama360Sphere
         imageUrl={panoramaUrl}
         radius={50} 
@@ -92,7 +105,8 @@ export function VRPanorama({
   apiKey,
   height = '600px',
   autoRotate = false,
-  autoRotateSpeed = 0.002
+  autoRotateSpeed = 0.002,
+  showControllers = false
 }: VRPanoramaProps) {
   return (
     <div className="vr-panorama-container" style={{ position: 'relative' }}>
@@ -117,6 +131,7 @@ export function VRPanorama({
               apiKey={apiKey}
               autoRotate={autoRotate}
               autoRotateSpeed={autoRotateSpeed}
+              showControllers={showControllers}
             />
           </XR>
         </Canvas>

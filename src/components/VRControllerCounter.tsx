@@ -122,11 +122,9 @@ export function VRControllerCounter({
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
   
-  // Three.js WebXR関連の状態を取得
   const { gl } = useThree();
   const session = useXR(state => state.session);
   
-  // VRControllerServiceのインスタンスを取得
   const vrControllerService = useRef(VRControllerService.getInstance());
 
   useFrame(() => {
