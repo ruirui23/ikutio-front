@@ -65,7 +65,6 @@ export default function Basic3DScene() {
   const [location, setLocation] = useState<string>('Shibuya Crossing, Tokyo');
   const [inputLocation, setInputLocation] = useState<string>('Shibuya Crossing, Tokyo');
 
-  // 環境変数からAPIキーを取得
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   
   // ログは一度だけ出力
