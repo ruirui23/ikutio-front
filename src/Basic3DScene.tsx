@@ -3,7 +3,8 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
 import { PanoramaSphere } from './components/PanoramaSphere';
-// カメラ情報表示
+import './styles/Basic3DScene.css';
+
 function CameraInfo() {
   const { camera } = useThree();
   const [position, setPosition] = useState<number[]>([0, 0, 0]);
@@ -59,7 +60,6 @@ const xrStore = createXRStore({
   foveation: 0.5,
 });
 
-// メインコンポーネント
 export default function Basic3DScene() {
   const [fps, setFps] = useState<number>(0);
   const [location, setLocation] = useState<string>('Shibuya Crossing, Tokyo');
@@ -74,100 +74,46 @@ export default function Basic3DScene() {
   }, []);
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div className="basic3d-scene-container">
       {/* VRボタン */}
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        right: '120px',
-        background: 'rgba(0, 0, 0, 0.9)',
-        color: 'white',
-        padding: '15px',
-        borderRadius: '8px',
-        zIndex: 1001,
-        maxWidth: '250px'
-      }}>
-        <h4 style={{ margin: '0 0 10px 0', color: '#4ECDC4' }}>VR体験</h4>
+      <div className="vr-controls-container">
+        <h4 className="vr-controls-title">VR体験</h4>
         <button
           onClick={() => xrStore.enterVR()}
-          style={{
-            width: '100%',
-            padding: '12px 15px',
-            background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px'
-          }}
+          className="vr-enter-button"
         >
           VRで360度体験
         </button>
-        <div style={{ 
-          marginTop: '8px', 
-          fontSize: '11px', 
-          opacity: 0.8,
-          lineHeight: '1.3'
-        }}>
+        <div className="vr-help-text">
           ※VRゴーグルが必要です<br/>
           Meta Quest, Vive等に対応
         </div>
       </div>
 
       {/* 場所変更UI */}
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        left: '10px',
-        background: 'rgba(0, 0, 0, 0.8)',
-        color: 'white',
-        padding: '15px',
-        borderRadius: '8px',
-        zIndex: 1000,
-        maxWidth: '300px'
-      }}>
-        <h3 style={{ margin: '0 0 10px 0', color: '#4CAF50' }}> 場所を変更</h3>
+      <div className="location-controls-container">
+        <h3 className="location-controls-title"> 場所を変更</h3>
         <input
           type="text"
           value={inputLocation}
           onChange={(e) => setInputLocation(e.target.value)}
           placeholder="場所を入力（例: Shibuya Crossing, Tokyo）"
-          style={{
-            width: '100%',
-            padding: '8px',
-            marginBottom: '10px',
-            borderRadius: '4px',
-            border: 'none',
-            boxSizing: 'border-box'
-          }}
+          className="location-input"
         />
         <button
           onClick={() => setLocation(inputLocation)}
-          style={{
-            width: '100%',
-            padding: '8px',
-            background: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          className="location-submit-button"
         >
           移動
         </button>
-        <div style={{ marginTop: '10px', fontSize: '12px', opacity: 0.8 }}>
+        <div className="current-location-text">
           現在: {location}
         </div>
       </div>
       
       <Canvas
         camera={{ position: [0, 0, 0], fov: 75 }}
-        style={{ background: '#000' }}
+        className="basic3d-canvas"
         gl={{ antialias: true, alpha: false }}
       >
         <XR store={xrStore}>
