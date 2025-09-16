@@ -36,18 +36,6 @@ function CameraInfo() {
   );
 }
 
-// パフォーマンス監視
-function PerformanceMonitor({ onFpsUpdate }: { onFpsUpdate: (fps: number) => void }) {
-  useFrame((state) => {
-    if (state.clock) {
-      const fps = Math.round(1 / state.clock.getDelta());
-      onFpsUpdate(fps);
-    }
-  });
-  
-  return null;
-}
-
 // XRストアを作成
 const xrStore = createXRStore({
   controller: { 
@@ -61,7 +49,6 @@ const xrStore = createXRStore({
 });
 
 export default function Basic3DScene() {
-  const [fps, setFps] = useState<number>(0);
   const [location, setLocation] = useState<string>('Shibuya Crossing, Tokyo');
   const [inputLocation, setInputLocation] = useState<string>('Shibuya Crossing, Tokyo');
 
@@ -121,7 +108,6 @@ export default function Basic3DScene() {
           <ambientLight intensity={1} />
           <PanoramaSphere location={location} apiKey={apiKey} />
           <CameraInfo />
-          <PerformanceMonitor onFpsUpdate={setFps} />
           {/* VR環境では OrbitControls は自動的に無効化される */}
           <OrbitControls
             enablePan={true}
