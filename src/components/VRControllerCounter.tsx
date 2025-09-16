@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { useXR } from '@react-three/xr';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -118,7 +118,6 @@ export function VRControllerCounter({
 }: VRControllerCounterProps) {
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
-  const [debugInfo, setDebugInfo] = useState<string>('');
   
   // Three.js WebXR関連の状態を取得
   const { gl } = useThree();
@@ -128,32 +127,18 @@ export function VRControllerCounter({
   const wasLeftAbove = useRef<boolean | null>(null);
   const bothInitialized = useRef(false);
 
-  const updateDebugInfo = useCallback((info: string) => {
-    setDebugInfo(info);
-  }, []);
-
   useFrame(() => {
     if (!session || !gl.xr.isPresenting) {
-      updateDebugInfo('No XR session active or not presenting');
       return;
     }
     
     const now = Date.now();
-    let debugLines: string[] = [];
     
     // WebXRの状態をチェック
     const referenceSpace = gl.xr.getReferenceSpace();
     const frame = gl.xr.getFrame();
     
-    debugLines.push(`Session: ${!!session}`);
-    debugLines.push(`Presenting: ${gl.xr.isPresenting}`);
-    debugLines.push(`Reference Space: ${!!referenceSpace}`);
-    debugLines.push(`Frame: ${!!frame}`);
-    debugLines.push(`Input Sources: ${session.inputSources.length}`);
-    
     if (!referenceSpace || !frame) {
-      debugLines.push('Missing WebXR reference space or frame');
-      updateDebugInfo(debugLines.join('\n'));
       return;
     }
     
@@ -165,12 +150,7 @@ export function VRControllerCounter({
       source => source.handedness === 'right' && source.targetRayMode === 'tracked-pointer'
     );
     
-    debugLines.push(`Left Source: ${!!leftSource}`);
-    debugLines.push(`Right Source: ${!!rightSource}`);
-    
     if (!leftSource || !rightSource) {
-      debugLines.push('Waiting for both controllers to be tracked...');
-      updateDebugInfo(debugLines.join('\n'));
       bothInitialized.current = false;
       return;
     }
@@ -179,12 +159,7 @@ export function VRControllerCounter({
     const leftSpace = leftSource.gripSpace || leftSource.targetRaySpace;
     const rightSpace = rightSource.gripSpace || rightSource.targetRaySpace;
     
-    debugLines.push(`Left Space: ${leftSpace ? (leftSource.gripSpace ? 'grip' : 'target') : 'none'}`);
-    debugLines.push(`Right Space: ${rightSpace ? (rightSource.gripSpace ? 'grip' : 'target') : 'none'}`);
-    
     if (!leftSpace || !rightSpace) {
-      debugLines.push('Controller spaces not available');
-      updateDebugInfo(debugLines.join('\n'));
       return;
     }
     
@@ -192,12 +167,7 @@ export function VRControllerCounter({
     const leftPose = frame.getPose(leftSpace, referenceSpace);
     const rightPose = frame.getPose(rightSpace, referenceSpace);
     
-    debugLines.push(`Left Pose: ${!!leftPose}`);
-    debugLines.push(`Right Pose: ${!!rightPose}`);
-    
     if (!leftPose || !rightPose) {
-      debugLines.push('Controller poses not available');
-      updateDebugInfo(debugLines.join('\n'));
       return;
     }
     
@@ -205,29 +175,17 @@ export function VRControllerCounter({
     const leftPos = leftPose.transform.position;
     const rightPos = rightPose.transform.position;
     
-    debugLines.push(`Left Pos: (${leftPos.x.toFixed(3)}, ${leftPos.y.toFixed(3)}, ${leftPos.z.toFixed(3)})`);
-    debugLines.push(`Right Pos: (${rightPos.x.toFixed(3)}, ${rightPos.y.toFixed(3)}, ${rightPos.z.toFixed(3)})`);
-    
     // 初期化完了
     if (!bothInitialized.current) {
       bothInitialized.current = true;
-      debugLines.push('✅ Both controllers initialized!');
-      console.log('Controllers initialized successfully');
-      console.log('Left position:', leftPos);
-      console.log('Right position:', rightPos);
     }
     
     // Y軸での上下関係を判定
     const isLeftAbove = leftPos.y > rightPos.y;
     const yDifference = Math.abs(leftPos.y - rightPos.y);
     
-    debugLines.push(`Left Above: ${isLeftAbove}`);
-    debugLines.push(`Y Difference: ${yDifference.toFixed(3)}m`);
-    debugLines.push(`Previous State: ${wasLeftAbove.current}`);
-    
     // クールダウン期間をチェック
     const cooldownRemaining = Math.max(0, cooldownMs - (now - lastCrossTime.current));
-    debugLines.push(`Cooldown: ${cooldownRemaining}ms`);
     
     if (wasLeftAbove.current !== null && 
         wasLeftAbove.current !== isLeftAbove && 
@@ -247,38 +205,21 @@ export function VRControllerCounter({
       
       onCount?.(totalCount, triggerHand);
       lastCrossTime.current = now;
-      
-      debugLines.push(`🎉 CROSSING DETECTED!`);
-      debugLines.push(`Total: ${totalCount}, Trigger: ${triggerHand}`);
-      debugLines.push(`New Counts - Left: ${newLeftCount}, Right: ${newRightCount}`);
-      
-      // コンソールにもログ出力
-      console.log(`🎉 Controller crossing detected!`);
-      console.log(`Previous: Left was ${wasLeftAbove.current ? 'above' : 'below'}`);
-      console.log(`Current: Left is ${isLeftAbove ? 'above' : 'below'}`);
-      console.log(`Y difference: ${yDifference.toFixed(3)}m`);
-      console.log(`Total count: ${totalCount}`);
     }
     
     // 上下関係を保存（次回の比較用）
     wasLeftAbove.current = isLeftAbove;
-    
-    debugLines.push(`Total Counts - Left: ${leftCount}, Right: ${rightCount}`);
-    
-    updateDebugInfo(debugLines.join('\n'));
   });
 
-  return { leftCount, rightCount, debugInfo };
+  return { leftCount, rightCount };
 }
 
 export function VRControllerCounterDisplay({ 
   leftCount, 
-  rightCount,
-  debugInfo
+  rightCount
 }: { 
   leftCount: number; 
   rightCount: number; 
-  debugInfo?: string;
 }) {
   return (
     <div style={{
@@ -306,27 +247,9 @@ export function VRControllerCounterDisplay({
       }}>
         総計: {leftCount + rightCount}回
       </div>
-      <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '10px' }}>
+      <div style={{ fontSize: '14px', opacity: 0.9 }}>
         💡 左右のコントローラーをY軸で交差させてください
       </div>
-      {debugInfo && (
-        <div style={{ 
-          fontSize: '11px', 
-          opacity: 0.7, 
-          whiteSpace: 'pre-wrap',
-          fontFamily: 'Consolas, Monaco, monospace',
-          maxHeight: '250px',
-          overflow: 'auto',
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          padding: '8px',
-          borderRadius: '5px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          marginTop: '10px'
-        }}>
-          Debug Info:
-          {debugInfo}
-        </div>
-      )}
     </div>
   );
 }
