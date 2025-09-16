@@ -1,9 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
-import { useXR, useXRInputSourceState } from '@react-three/xr';
+import { useXR } from '@react-three/xr';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-// コントローラーの位置を視覚化するコンポーネント
 export function ControllerVisualizer({ hand }: { hand: 'left' | 'right' }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { gl } = useThree();
@@ -230,15 +229,14 @@ export function VRControllerCounter({
     const cooldownRemaining = Math.max(0, cooldownMs - (now - lastCrossTime.current));
     debugLines.push(`Cooldown: ${cooldownRemaining}ms`);
     
-    // 交差検知：前回の上下関係と現在が異なる場合
     if (wasLeftAbove.current !== null && 
         wasLeftAbove.current !== isLeftAbove && 
         cooldownRemaining === 0 && 
-        yDifference > 0.02) { // 最小移動距離 2cm
+        yDifference > 0.02) { 
       
       // 交差が発生！
       const totalCount = leftCount + rightCount + 1;
-      const triggerHand = isLeftAbove ? 'right' : 'left'; // 下に移動したコントローラー
+      const triggerHand = isLeftAbove ? 'right' : 'left';
       
       // カウントを更新
       const newLeftCount = Math.ceil(totalCount / 2);
