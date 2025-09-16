@@ -71,6 +71,27 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* アプリ全体のコンテナ */
+.app-root {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ローディング画面 */
+.loading-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+}
+
+.loading-text {
+  color: white;
+  font-size: 18px;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
   .panorama-page-container,
