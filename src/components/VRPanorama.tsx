@@ -54,7 +54,9 @@ function VRPanoramaLoader({
   const { panoramaUrl, loading, error, loadPanorama } = usePanoramaLoader({
     pathData,
     currentPointIndex,
-    apiKey
+    apiKey,
+    latitude,
+    longitude
   });
 
   // VRControllerCounterからカウント情報を取得

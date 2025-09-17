@@ -48,10 +48,12 @@ function WebPanoramaLoader({
   const { panoramaUrl, loading, error, loadPanorama } = usePanoramaLoader({
     pathData,
     currentPointIndex,
-    apiKey
+    apiKey,
+    latitude,
+    longitude
   });
 
-  // 緯度経度が提供された場合は直接読み込む
+  // 緯度経度が変更された場合の追加ロード処理（既存のuseEffectから移動）
   useEffect(() => {
     if (latitude !== undefined && longitude !== undefined) {
       loadPanorama(latitude, longitude, apiKey);
