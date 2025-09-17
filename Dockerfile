@@ -15,9 +15,8 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY ./default.conf /etc/nginx/conf.d/default.conf
 
 # デバッグ: nginx内のファイルを確認
-RUN echo "=== Nginx html directory ===" && ls -la /usr/share/nginx/html/
-RUN echo "=== Nginx assets directory ===" && ls -la /usr/share/nginx/html/assets/ || echo "No assets directory found"
-RUN echo "=== Final index.html ===" && cat /usr/share/nginx/html/index.html
+RUN ls -la /usr/share/nginx/html/
+RUN ls -la /usr/share/nginx/html/assets/
 
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
