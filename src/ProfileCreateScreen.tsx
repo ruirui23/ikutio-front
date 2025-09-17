@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import type { User } from './types/user';
 import { AuthService } from './services/auth';
-import { ProfileService } from './services/profile';
 
 interface ProfileCreateScreenProps {
   user: User | null;
