@@ -15,48 +15,9 @@ export class StreetViewService {
             throw new Error('Canvas context could not be created');
         }
 
-        // 空のグラデーション背景を作成
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#87CEEB');
-        gradient.addColorStop(0.4, '#98D8E8');
-        gradient.addColorStop(0.7, '#90EE90');
-        gradient.addColorStop(1, '#228B22');
-
-        ctx.fillStyle = gradient;
+        // シンプルなグレー背景
+        ctx.fillStyle = '#CCCCCC';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // 雲を追加
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        for (let i = 0; i < 20; i++) {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height * 0.4;
-            const radius = Math.random() * 30 + 20;
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // グリッド線を追加
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 2;
-
-        // 垂直線
-        for (let i = 0; i <= 8; i++) {
-            const x = (canvas.width / 8) * i;
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvas.height);
-            ctx.stroke();
-        }
-
-        // 水平線
-        for (let i = 0; i <= 4; i++) {
-            const y = (canvas.height / 4) * i;
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
-        }
 
         const canvasTexture = new THREE.CanvasTexture(canvas);
         canvasTexture.mapping = THREE.UVMapping;
@@ -253,78 +214,9 @@ export class StreetViewService {
             throw new Error('Canvas context could not be created');
         }
 
-        // 空のグラデーション背景を作成
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, '#87CEEB'); // 空色
-        gradient.addColorStop(0.7, '#98FB98'); // 淡い緑
-        gradient.addColorStop(1, '#8FBC8F'); // 暗い緑
-
-        ctx.fillStyle = gradient;
+        // シンプルなグレー背景
+        ctx.fillStyle = '#CCCCCC';
         ctx.fillRect(0, 0, width, height);
-
-        // 地平線
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(0, height * 0.7);
-        ctx.lineTo(width, height * 0.7);
-        ctx.stroke();
-
-        // 方角を示すラベルと色分け
-        const directions = [
-            { angle: 0, label: '北', color: '#FF6B6B', x: width * 0.5 },
-            { angle: 90, label: '東', color: '#4ECDC4', x: width * 0.75 },
-            { angle: 180, label: '南', color: '#45B7D1', x: width * 1.0 },
-            { angle: 270, label: '西', color: '#A8E6CF', x: width * 0.25 }
-        ];
-
-        directions.forEach((dir, index) => {
-            // 方向に応じた縦の帯を描画
-            const bandWidth = width / 4;
-            const startX = (index * bandWidth) % width;
-
-            ctx.fillStyle = dir.color;
-            ctx.globalAlpha = 0.3;
-            ctx.fillRect(startX, 0, bandWidth, height);
-
-            // 方角ラベル
-            ctx.globalAlpha = 1;
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 48px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(dir.label, startX + bandWidth / 2, 80);
-            ctx.fillText(`${dir.angle}°`, startX + bandWidth / 2, 140);
-        });
-
-        // グリッド線
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 2;
-        ctx.globalAlpha = 0.5;
-
-        // 縦線（経度線）
-        for (let i = 0; i <= 8; i++) {
-            const x = (width / 8) * i;
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
-            ctx.stroke();
-        }
-
-        // 横線（緯度線）
-        for (let i = 0; i <= 4; i++) {
-            const y = (height / 4) * i;
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(width, y);
-            ctx.stroke();
-        }
-
-        // 中央にタイトル
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 64px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('360° パノラマテスト', width / 2, height / 2);
 
         const canvasTexture = new THREE.CanvasTexture(canvas);
         canvasTexture.mapping = THREE.EquirectangularReflectionMapping;
@@ -386,7 +278,7 @@ export class StreetViewService {
             for (let i = 0; i < images.length; i++) {
                 if (images[i]) {
                     const x = i * imageWidth;
-                    
+
                     // 境界でのソフトブレンディングのためのマスクを作成
                     if (i > 0) {
                         // 左端をフェードイン
@@ -394,23 +286,23 @@ export class StreetViewService {
                         const gradient = ctx.createLinearGradient(x, 0, x + fadeWidth, 0);
                         gradient.addColorStop(0, 'rgba(0,0,0,0)');
                         gradient.addColorStop(1, 'rgba(0,0,0,1)');
-                        
+
                         ctx.save();
                         ctx.globalCompositeOperation = 'destination-out';
                         ctx.fillStyle = gradient;
                         ctx.fillRect(x, 0, fadeWidth, 640);
                         ctx.restore();
                     }
-                    
+
                     ctx.drawImage(images[i], x, 0, imageWidth, 640);
-                    
+
                     if (i < images.length - 1) {
                         // 右端をフェードアウト
                         const fadeWidth = 20;
                         const gradient = ctx.createLinearGradient(x + imageWidth - fadeWidth, 0, x + imageWidth, 0);
                         gradient.addColorStop(0, 'rgba(0,0,0,1)');
                         gradient.addColorStop(1, 'rgba(0,0,0,0)');
-                        
+
                         ctx.save();
                         ctx.globalCompositeOperation = 'destination-out';
                         ctx.fillStyle = gradient;
@@ -447,7 +339,7 @@ export class StreetViewService {
     }
 
     /**
-     * Street View画像をHTMLImageElementとして取得（ヘルパー関数）
+     * Street View画像をHTMLImageElementとして取得
      */
     private static loadStreetViewImage(
         latitude: number,
