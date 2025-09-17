@@ -5,9 +5,10 @@ interface HomeScreenProps {
   onStartGame: () => void;
   onLogout: () => void;
   onStartVRDemo?: () => void;
+  onSelectRoute?: () => void;
 }
 
-export default function HomeScreen({ user, onStartGame, onLogout, onStartVRDemo }: HomeScreenProps) {
+export default function HomeScreen({ user, onStartGame, onLogout, onStartVRDemo, onSelectRoute }: HomeScreenProps) {
   return (
     <div style={{
       width: '100vw',
@@ -73,7 +74,7 @@ export default function HomeScreen({ user, onStartGame, onLogout, onStartVRDemo 
 
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={onStartGame}
+            onClick={() => { if (onSelectRoute) onSelectRoute(); else onStartGame(); }}
             style={{
               padding: '16px 32px',
               fontSize: '18px',

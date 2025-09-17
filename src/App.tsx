@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
 import Map from './pages/map';
 import './styles/App.css';
-
-type AppState = 'login' | 'home' | 'game';
+import SelectRoute from './pages/select-route.tsx';
 
 export default function App() {
-  const [appState, setAppState] = useState<AppState>('login');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,28 +16,17 @@ export default function App() {
     const { token, user: savedUser } = AuthService.getAuthData();
     if (token && savedUser) {
       setUser(savedUser);
-      setAppState('home');
     }
     setLoading(false);
   }, []);
 
   const handleLogin = (userData: User) => {
     setUser(userData);
-    setAppState('home');
-  };
-
-  const handleStartGame = () => {
-    setAppState('game');
-  };
-
-  const handleGuestAccess = () => {
-    setAppState('game');
   };
 
   const handleLogout = () => {
     AuthService.logout();
     setUser(null);
-    setAppState('login');
   };
 
   if (loading) {
@@ -49,21 +37,32 @@ export default function App() {
     );
   }
 
+  if (!user) {
+    return <LoginScreen onLogin={handleLogin} onGuestAccess={() => { /* guest -> handleLogin maybe */ }} />;
+  }
+
+  // When logged in, render routes
   return (
     <div className="app-root">
-      {appState === 'login' && (
-        <LoginScreen onLogin={handleLogin} onGuestAccess={handleGuestAccess} />
-      )}
-      {appState === 'home' && (
-        <HomeScreen 
-          user={user} 
-          onStartGame={handleStartGame}
-          onLogout={handleLogout}
-        />
-      )}
-      {appState === 'game' && (
-        <Map />
-      )}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomeRouteWrapper user={user} onLogout={handleLogout} />} />
+          <Route path="/select-route" element={<SelectRoute />} />
+          <Route path="/game" element={<Map />} />
+        </Routes>
+      </BrowserRouter>
     </div>
+  );
+}
+
+function HomeRouteWrapper({ user, onLogout }: { user: User; onLogout: () => void }) {
+  const navigate = useNavigate();
+  return (
+    <HomeScreen
+      user={user}
+      onStartGame={() => navigate('/game')}
+      onLogout={onLogout}
+      onSelectRoute={() => navigate('/select-route')}
+    />
   );
 }
