@@ -24,30 +24,25 @@ const ProfileCreateScreen: React.FC<ProfileCreateScreenProps> = ({
       setError('表示名を入力してください');
       return;
     }
-    setLoading(true);
-    setError('');
-    try {
-      // Service 経由で実行 (レスポンスは { name })
-      await ProfileService.createProfile({ name: displayName.trim() });
-      const authData = AuthService.getAuthData();
-      const token = authData.token!; // ここまで来て null のはずはない
-      const updatedUser: User = {
-        ...user!,
-        displayName: displayName.trim(),
-        // profileId: 将来 id が返るようになったら設定
-      };
-      AuthService.saveAuthData(token, updatedUser);
-      onProfileCreated(updatedUser);
-    } catch (err) {
-      console.error('Profile creation error:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('プロフィールの作成に失敗しました');
-      }
-    } finally {
-      setLoading(false);
-    }
+        setLoading(true);
+        setError('');
+        try {
+          // モック処理: 2秒待ってから成功
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const authData = AuthService.getAuthData();
+          const token = authData.token!;
+          const updatedUser: User = {
+            ...user!,
+            displayName: displayName.trim(),
+            profileId: `mock-profile-${Date.now()}`,
+          };
+          AuthService.saveAuthData(token, updatedUser);
+          onProfileCreated(updatedUser);
+        } catch (err) {
+          setError('モック: プロフィール作成に失敗しました');
+        } finally {
+          setLoading(false);
+        }
   };
 
   return (
