@@ -106,7 +106,7 @@ export function InteractivePanorama({
   }, []);
 
   return (
-    <div className="interactive-panorama-container" style={{ position: 'relative' }}>
+    <div className="interactive-panorama-container">
       {/* コントロールパネル */}
       <div className="panorama-controls">
         <button

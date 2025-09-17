@@ -6,6 +6,8 @@ export interface UsePanoramaLoaderOptions {
     pathData?: PathData;
     currentPointIndex?: number;
     apiKey?: string;
+    latitude?: number;
+    longitude?: number;
 }
 
 export interface UsePanoramaLoaderReturn {
@@ -18,7 +20,9 @@ export interface UsePanoramaLoaderReturn {
 export function usePanoramaLoader({
     pathData,
     currentPointIndex = 0,
-    apiKey
+    apiKey,
+    latitude,
+    longitude
 }: UsePanoramaLoaderOptions): UsePanoramaLoaderReturn {
     const [panoramaUrl, setPanoramaUrl] = useState<string | undefined>();
     const [loading, setLoading] = useState(true);
@@ -51,16 +55,31 @@ export function usePanoramaLoader({
     useEffect(() => {
         const loadFromPath = async () => {
             try {
-                const result = await PanoramaLoaderService.loadPanoramaFromPath(
-                    pathData,
-                    currentPointIndex,
-                    apiKey
-                );
+                // 明示的な緯度経度が渡されている場合は、それを優先
+                if (latitude !== undefined && longitude !== undefined) {
+                    const result = await PanoramaLoaderService.loadPanoramaUrl(
+                        latitude,
+                        longitude,
+                        apiKey
+                    );
+                    setPanoramaUrl(result.url);
 
-                setPanoramaUrl(result.url);
+                    if (!result.isFromApi && apiKey && apiKey.trim() !== '') {
+                        console.warn('Street View APIでの画像取得に失敗しました。');
+                    }
+                } else {
+                    // pathDataから取得する場合
+                    const result = await PanoramaLoaderService.loadPanoramaFromPath(
+                        pathData,
+                        currentPointIndex,
+                        apiKey
+                    );
 
-                if (!result.isFromApi && apiKey && apiKey.trim() !== '') {
-                    console.warn('Street View APIでの画像取得に失敗しました。');
+                    setPanoramaUrl(result.url);
+
+                    if (!result.isFromApi && apiKey && apiKey.trim() !== '') {
+                        console.warn('Street View APIでの画像取得に失敗しました。');
+                    }
                 }
             } catch (err) {
                 console.error('Error loading panorama:', err);
@@ -71,7 +90,7 @@ export function usePanoramaLoader({
         };
 
         loadFromPath();
-    }, [pathData, currentPointIndex, apiKey]);
+    }, [pathData, currentPointIndex, apiKey, latitude, longitude]);
 
     return {
         panoramaUrl,
