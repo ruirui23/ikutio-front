@@ -5,7 +5,7 @@ import type { User } from './types/user';
 import Map from './pages/map';
 import './styles/App.css';
 
-type AppState = 'login' | 'home' | 'game' ;
+type AppState = 'login' | 'home' | 'game';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('login');
@@ -22,6 +22,10 @@ export default function App() {
   }, []);
 
   const handleStartGame = () => {
+    setAppState('game');
+  };
+
+  const handleGuestAccess = () => {
     setAppState('game');
   };
 
@@ -44,7 +48,6 @@ export default function App() {
       {appState === 'login' && (
         // <LoginScreen onLogin={handleLogin} />
         <Map />
-      )}
       {appState === 'home' && (
         <HomeScreen 
           user={user} 
