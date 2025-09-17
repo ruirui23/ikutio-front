@@ -9,7 +9,6 @@ import './styles/App.css';
 
 type AppState = 'login' | 'profile-create' | 'home' | 'game';
 
-
 export default function App() {
   const [appState, setAppState] = useState<AppState>('login');
   const [user, setUser] = useState<User | null>(null);
@@ -49,6 +48,10 @@ export default function App() {
     setAppState('game');
   };
 
+  const handleGuestAccess = () => {
+    setAppState('game');
+  };
+
   const handleLogout = () => {
     AuthService.logout();
     setUser(null);
@@ -66,7 +69,7 @@ export default function App() {
   return (
     <div className="app-root">
       {appState === 'login' && (
-        <LoginScreen onLogin={handleLogin} />
+        <LoginScreen onLogin={handleLogin} onGuestAccess={handleGuestAccess} />
       )}
       {appState === 'profile-create' && (
         <ProfileCreateScreen 
