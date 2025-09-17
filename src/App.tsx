@@ -29,6 +29,10 @@ export default function App() {
     setAppState('game');
   };
 
+  const handleGuestAccess = () => {
+    setAppState('game');
+  };
+
   const handleLogout = () => {
     AuthService.logout();
     setUser(null);
