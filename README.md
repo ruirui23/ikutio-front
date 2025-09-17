@@ -26,13 +26,17 @@ https://topaz.dev/projects/2dfc326b6e2a50b733d9
 - @react-three/drei
 - @react-three/xr
 - Street View Static API
-  $ バックエンド
+## バックエンド
   - grpc
   - redis
   - Dynamodb
   - websocket
   - axum
-  - utoipa
-  # モバイル
+## モバイル
+- Kotlin
+- Jetpack Compose
+- Hilt
+- Retrofit
+- Room
   - Kotlin
   - Jetpack Compose
