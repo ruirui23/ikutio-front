@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { User } from './types/user';
 import { AuthService } from './services/auth';
+import { ProfileService } from './services/profile';
 
 interface ProfileCreateScreenProps {
   user: User | null;
@@ -26,36 +27,14 @@ const ProfileCreateScreen: React.FC<ProfileCreateScreenProps> = ({
     setLoading(true);
     setError('');
     try {
+      // Service 経由で実行 (レスポンスは { name })
+      await ProfileService.createProfile({ name: displayName.trim() });
       const authData = AuthService.getAuthData();
-      const token = authData.token;
-      if (!token) {
-        throw new Error('認証トークンが見つかりません');
-      }
-      const response = await fetch('http://localhost:50052/create_profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          name: displayName.trim()
-        })
-      });
-      if (!response.ok) {
-        let errorMessage = 'プロフィール作成に失敗しました';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          // JSONパースエラーは無視
-        }
-        throw new Error(errorMessage);
-      }
-      const profileData = await response.json();
+      const token = authData.token!; // ここまで来て null のはずはない
       const updatedUser: User = {
         ...user!,
         displayName: displayName.trim(),
-        profileId: profileData.profile_id,
+        // profileId: 将来 id が返るようになったら設定
       };
       AuthService.saveAuthData(token, updatedUser);
       onProfileCreated(updatedUser);
