@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import LoginScreen from './LoginScreen';
+import ProfileCreateScreen from './ProfileCreateScreen';
 import HomeScreen from './HomeScreen';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
 import Map from './pages/map';
+import TimerStream from './components/TimerStream';
 import './styles/App.css';
 
-type AppState = 'login' | 'home' | 'game';
+type AppState = 'login' | 'profile-create' | 'home' | 'game';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('login');
@@ -17,13 +19,29 @@ export default function App() {
     const { token, user: savedUser } = AuthService.getAuthData();
     if (token && savedUser) {
       setUser(savedUser);
-      setAppState('home');
+      // displayNameがあればプロフィール作成済みとみなす
+      if (savedUser.displayName && savedUser.displayName.trim() !== '') {
+        setAppState('home');
+      } else {
+        setAppState('profile-create');
+      }
     }
     setLoading(false);
   }, []);
 
   const handleLogin = (userData: User) => {
     setUser(userData);
+    // displayNameがあればホーム画面へ、なければプロフィール作成画面へ
+    if (userData.displayName && userData.displayName.trim() !== '') {
+      setAppState('home');
+    } else {
+      setAppState('profile-create');
+    }
+  };
+
+  const handleProfileCreated = (updatedUser: User) => {
+    setUser(updatedUser);
+    AuthService.saveAuthData(AuthService.getAuthData().token!, updatedUser);
     setAppState('home');
   };
 
@@ -49,10 +67,20 @@ export default function App() {
     );
   }
 
+  // JWTをAuthServiceから取得
+  const jwt = AuthService.getAuthData().token;
+
   return (
     <div className="app-root">
       {appState === 'login' && (
         <LoginScreen onLogin={handleLogin} onGuestAccess={handleGuestAccess} />
+      )}
+      {appState === 'profile-create' && (
+        <ProfileCreateScreen 
+          user={user} 
+          onProfileCreated={handleProfileCreated}
+          onLogout={handleLogout}
+        />
       )}
       {appState === 'home' && (
         <HomeScreen 
@@ -62,7 +90,11 @@ export default function App() {
         />
       )}
       {appState === 'game' && (
-        <Map />
+        <>
+          <Map />
+          {/* JWTがあればTimerStreamを表示 */}
+          {jwt ? <TimerStream jwt={jwt} /> : <span>JWTがありません</span>}
+        </>
       )}
     </div>
   );
