@@ -13,6 +13,8 @@ interface WebPanoramaProps {
   height?: string;
   autoRotate?: boolean;
   autoRotateSpeed?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 function WebPanoramaCamera() {
@@ -31,19 +33,30 @@ function WebPanoramaLoader({
   currentPointIndex = 0, 
   apiKey,
   autoRotate = false,
-  autoRotateSpeed = 0.002
+  autoRotateSpeed = 0.002,
+  latitude,
+  longitude
 }: {
   pathData?: PathData;
   currentPointIndex?: number;
   apiKey?: string;
   autoRotate?: boolean;
   autoRotateSpeed?: number;
+  latitude?: number;
+  longitude?: number;
 }) {
-  const { panoramaUrl, loading, error } = usePanoramaLoader({
+  const { panoramaUrl, loading, error, loadPanorama } = usePanoramaLoader({
     pathData,
     currentPointIndex,
     apiKey
   });
+
+  // 緯度経度が提供された場合は直接読み込む
+  useEffect(() => {
+    if (latitude !== undefined && longitude !== undefined) {
+      loadPanorama(latitude, longitude, apiKey);
+    }
+  }, [latitude, longitude, apiKey, loadPanorama]);
 
   return (
     <>
@@ -104,7 +117,9 @@ export function WebPanorama({
   apiKey,
   height = '600px',
   autoRotate = false,
-  autoRotateSpeed = 0.002
+  autoRotateSpeed = 0.002,
+  latitude,
+  longitude
 }: WebPanoramaProps) {
   return (
     <div className="web-panorama-container">
@@ -127,6 +142,8 @@ export function WebPanorama({
             apiKey={apiKey}
             autoRotate={autoRotate}
             autoRotateSpeed={autoRotateSpeed}
+            latitude={latitude}
+            longitude={longitude}
           />
         </Canvas>
       </div>

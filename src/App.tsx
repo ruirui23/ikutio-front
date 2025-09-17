@@ -48,7 +48,8 @@ export default function App() {
   return (
     <div className="app-root">
       {appState === 'login' && (
-        <LoginScreen onLogin={handleLogin} />
+        // <LoginScreen onLogin={handleLogin} />
+        <Map />
       )}
       {appState === 'home' && (
         <HomeScreen 

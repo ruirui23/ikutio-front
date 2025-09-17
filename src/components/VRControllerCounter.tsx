@@ -111,16 +111,19 @@ export function ControllerConnectionLine() {
 
 interface VRControllerCounterProps {
   onCount?: VRControllerCountCallback;
+  onCountReached?: (totalCount: number) => void; // 10の倍数に達したときのコールバック
   threshold?: number;
   cooldownMs?: number;
 }
 
 export function VRControllerCounter({ 
   onCount, 
+  onCountReached,
   cooldownMs = 300 
 }: VRControllerCounterProps) {
   const [leftCount, setLeftCount] = useState(0);
   const [rightCount, setRightCount] = useState(0);
+  const [previousTotal, setPreviousTotal] = useState(0); // 前回の総カウント数を記録
   
   const { gl } = useThree();
   const session = useXR(state => state.session);
@@ -140,6 +143,13 @@ export function VRControllerCounter({
     if (crossingResult.occurred) {
       setLeftCount(crossingResult.leftCount);
       setRightCount(crossingResult.rightCount);
+      
+      // 総カウント数をチェックし、10の倍数に達した場合にコールバックを実行
+      const totalCount = crossingResult.totalCount;
+      if (onCountReached && totalCount > previousTotal && totalCount % 10 === 0) {
+        onCountReached(totalCount);
+      }
+      setPreviousTotal(totalCount);
     }
   });
 
