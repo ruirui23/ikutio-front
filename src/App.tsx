@@ -6,7 +6,7 @@ import type { User } from './types/user';
 import Map from './pages/map';
 import './styles/App.css';
 
-type AppState = 'login' | 'home' | 'game' ;
+type AppState = 'login' | 'home' | 'game';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('login');
@@ -31,6 +31,10 @@ export default function App() {
     setAppState('game');
   };
 
+  const handleGuestAccess = () => {
+    setAppState('game');
+  };
+
   const handleLogout = () => {
     AuthService.logout();
     setUser(null);
@@ -48,7 +52,7 @@ export default function App() {
   return (
     <div className="app-root">
       {appState === 'login' && (
-        <LoginScreen onLogin={handleLogin} />
+        <LoginScreen onLogin={handleLogin} onGuestAccess={handleGuestAccess} />
       )}
       {appState === 'home' && (
         <HomeScreen 
