@@ -170,8 +170,8 @@ export class StreetViewService {
     ): Promise<TextureLoadResult> {
         return new Promise((resolve) => {
             const {
-                size = '1024x512',
-                fov = 120,
+                size = '640x640',
+                fov = 90,
                 heading = 0,
                 pitch = 0
             } = config;
@@ -354,7 +354,7 @@ export class StreetViewService {
             const directions = [0, 90, 180, 270];
             const imagePromises = directions.map(heading =>
                 StreetViewService.loadStreetViewImage(latitude, longitude, apiKey, {
-                    size: '512x512',
+                    size: '640x640',
                     fov: 90,
                     heading,
                     pitch: 0
@@ -365,8 +365,8 @@ export class StreetViewService {
 
             // キャンバスに4つの画像を横に並べて配置
             const canvas = document.createElement('canvas');
-            canvas.width = 2048; // 512 * 4
-            canvas.height = 512;
+            canvas.width = 2560; // 640 * 4
+            canvas.height = 640;
             const ctx = canvas.getContext('2d');
 
             if (!ctx) {
@@ -376,7 +376,7 @@ export class StreetViewService {
             // 各画像をキャンバスに描画
             for (let i = 0; i < images.length; i++) {
                 if (images[i]) {
-                    ctx.drawImage(images[i], i * 512, 0, 512, 512);
+                    ctx.drawImage(images[i], i * 640, 0, 640, 640);
                 }
             }
 
@@ -413,7 +413,7 @@ export class StreetViewService {
     ): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             const {
-                size = '512x512',
+                size = '640x640',
                 fov = 90,
                 heading = 0,
                 pitch = 0
