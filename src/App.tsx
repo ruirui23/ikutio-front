@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import LoginScreen from './LoginScreen';
+import ProfileCreateScreen from './ProfileCreateScreen';
 import HomeScreen from './HomeScreen';
 import Basic3DScene from './Basic3DScene';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
 
-type AppState = 'login' | 'home' | 'game';
+
+type AppState = 'login' | 'profile-create' | 'home' | 'game';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('login');
@@ -16,13 +18,29 @@ export default function App() {
     const { token, user: savedUser } = AuthService.getAuthData();
     if (token && savedUser) {
       setUser(savedUser);
-      setAppState('home');
+      // displayNameがあればプロフィール作成済みとみなす
+      if (savedUser.displayName && savedUser.displayName.trim() !== '') {
+        setAppState('home');
+      } else {
+        setAppState('profile-create');
+      }
     }
     setLoading(false);
   }, []);
 
   const handleLogin = (userData: User) => {
     setUser(userData);
+    // displayNameがあればホーム画面へ、なければプロフィール作成画面へ
+    if (userData.displayName && userData.displayName.trim() !== '') {
+      setAppState('home');
+    } else {
+      setAppState('profile-create');
+    }
+  };
+
+  const handleProfileCreated = (updatedUser: User) => {
+    setUser(updatedUser);
+    AuthService.saveAuthData(AuthService.getAuthData().token!, updatedUser);
     setAppState('home');
   };
 
@@ -55,6 +73,13 @@ export default function App() {
     <div style={{ width: '100vw', height: '100vh' }}>
       {appState === 'login' && (
         <LoginScreen onLogin={handleLogin} />
+      )}
+      {appState === 'profile-create' && (
+        <ProfileCreateScreen 
+          user={user} 
+          onProfileCreated={handleProfileCreated}
+          onLogout={handleLogout}
+        />
       )}
       {appState === 'home' && (
         <HomeScreen 

@@ -148,9 +148,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           fontSize: '14px',
           color: '#666'
         }}>
-          <strong>テスト用アカウント:</strong><br />
-          メール: test@example.com<br />
-          パスワード: password
+
         </div>
       </div>
     </div>
