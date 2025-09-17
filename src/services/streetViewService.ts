@@ -171,14 +171,14 @@ export class StreetViewService {
         return new Promise((resolve) => {
             const {
                 size = '640x640',
-                fov = 90,
+                fov = 60,
                 heading = 0,
                 pitch = 0
             } = config;
 
             // 緯度,経度の形式でURLを構築
             const location = `${latitude},${longitude}`;
-            const url = `https://maps.googleapis.com/maps/api/streetview?size=${size}&location=${encodeURIComponent(location)}&heading=${heading}&pitch=${pitch}&fov=${fov}&key=${apiKey}`;
+            const url = `https://maps.googleapis.com/maps/api/streetview?size=${size}&location=${encodeURIComponent(location)}&heading=${heading}&pitch=${pitch}&fov=${fov}&scale=2&format=png&key=${apiKey}`;
 
             const loader = new THREE.TextureLoader();
             loader.load(
@@ -189,6 +189,10 @@ export class StreetViewService {
                     loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
                     loadedTexture.flipY = true;
                     loadedTexture.needsUpdate = true;
+                    loadedTexture.minFilter = THREE.LinearMipmapLinearFilter;
+                    loadedTexture.magFilter = THREE.LinearFilter;
+                    loadedTexture.anisotropy = 16;
+                    loadedTexture.generateMipmaps = true;
 
                     resolve({
                         texture: loadedTexture,
@@ -215,7 +219,7 @@ export class StreetViewService {
     }
 
     /**
-     * 座標データからテクスチャを取得（メインメソッド）
+     * 座標データからテクスチャを取得
      */
     static async getTextureFromCoordinates(
         latitude: number,
@@ -240,7 +244,7 @@ export class StreetViewService {
     static createPanoramaTestTexture(): THREE.CanvasTexture {
         const canvas = document.createElement('canvas');
         const width = 2048;
-        const height = 1024; // 2:1のアスペクト比（360度パノラマ）
+        const height = 1024;
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
@@ -350,22 +354,23 @@ export class StreetViewService {
         }
 
         try {
-            // 4つの方向（北、東、南、西）の画像を取得
-            const directions = [0, 90, 180, 270];
+            // 8つの方向で滑らかなパノラマを作成
+            const directions = [0, 45, 90, 135, 180, 225, 270, 315];
             const imagePromises = directions.map(heading =>
                 StreetViewService.loadStreetViewImage(latitude, longitude, apiKey, {
                     size: '640x640',
-                    fov: 90,
+                    fov: 45,
                     heading,
-                    pitch: 0
+                    pitch: -10
                 })
             );
 
             const images = await Promise.all(imagePromises);
 
-            // キャンバスに4つの画像を横に並べて配置
+            // キャンバスに8つの画像を横に並べて配置（360度均等分割）
             const canvas = document.createElement('canvas');
-            canvas.width = 2560; // 640 * 4
+            const imageWidth = 640;
+            canvas.width = imageWidth * images.length; // 8つの画像を隙間なく配置
             canvas.height = 640;
             const ctx = canvas.getContext('2d');
 
@@ -373,10 +378,45 @@ export class StreetViewService {
                 throw new Error('Canvas context could not be created');
             }
 
-            // 各画像をキャンバスに描画
+            // 高品質な画像レンダリング設定
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            // 各画像をキャンバスに描画（境界ブレンディング付き）
             for (let i = 0; i < images.length; i++) {
                 if (images[i]) {
-                    ctx.drawImage(images[i], i * 640, 0, 640, 640);
+                    const x = i * imageWidth;
+                    
+                    // 境界でのソフトブレンディングのためのマスクを作成
+                    if (i > 0) {
+                        // 左端をフェードイン
+                        const fadeWidth = 20;
+                        const gradient = ctx.createLinearGradient(x, 0, x + fadeWidth, 0);
+                        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+                        gradient.addColorStop(1, 'rgba(0,0,0,1)');
+                        
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(x, 0, fadeWidth, 640);
+                        ctx.restore();
+                    }
+                    
+                    ctx.drawImage(images[i], x, 0, imageWidth, 640);
+                    
+                    if (i < images.length - 1) {
+                        // 右端をフェードアウト
+                        const fadeWidth = 20;
+                        const gradient = ctx.createLinearGradient(x + imageWidth - fadeWidth, 0, x + imageWidth, 0);
+                        gradient.addColorStop(0, 'rgba(0,0,0,1)');
+                        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                        
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(x + imageWidth - fadeWidth, 0, fadeWidth, 640);
+                        ctx.restore();
+                    }
                 }
             }
 
@@ -386,6 +426,10 @@ export class StreetViewService {
             panoramaTexture.wrapS = THREE.RepeatWrapping;
             panoramaTexture.wrapT = THREE.ClampToEdgeWrapping;
             panoramaTexture.flipY = false;
+            panoramaTexture.minFilter = THREE.LinearMipmapLinearFilter;
+            panoramaTexture.magFilter = THREE.LinearFilter;
+            panoramaTexture.anisotropy = 16;
+            panoramaTexture.generateMipmaps = true;
 
             return {
                 texture: panoramaTexture,
@@ -414,13 +458,13 @@ export class StreetViewService {
         return new Promise((resolve, reject) => {
             const {
                 size = '640x640',
-                fov = 90,
+                fov = 60,
                 heading = 0,
                 pitch = 0
             } = config;
 
             const location = `${latitude},${longitude}`;
-            const url = `https://maps.googleapis.com/maps/api/streetview?size=${size}&location=${encodeURIComponent(location)}&heading=${heading}&pitch=${pitch}&fov=${fov}&key=${apiKey}`;
+            const url = `https://maps.googleapis.com/maps/api/streetview?size=${size}&location=${encodeURIComponent(location)}&heading=${heading}&pitch=${pitch}&fov=${fov}&scale=2&format=png&key=${apiKey}`;
 
             const img = new Image();
             img.crossOrigin = 'anonymous';
