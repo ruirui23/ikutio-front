@@ -4,7 +4,7 @@ import { WebPanorama } from '../components/WebPanorama';
 import { RouteSelection } from '../components/RouteSelection';
 import type { PathData } from '../types/streetView';
 import type { LocationGroup, LocationData } from '../services/locationService';
-import { fetchLocationGroups, findLocationGroupById, getCurrentLocation, calculateProgress } from '../services/locationService';
+import { fetchLocationGroups, findLocationGroupById, getCurrentLocation } from '../services/locationService';
 import '../styles/map.css';
 import '../styles/RouteSelection.css';
 
@@ -82,14 +82,6 @@ export default function VRPanoramaPage() {
     setSelectedLocationId(locationId);
   }, []);
   
-  // 進行状況を計算
-  const progress = selectedLocationId && locationGroups.length > 0 
-    ? (() => {
-        const selectedGroup = findLocationGroupById(locationGroups, selectedLocationId);
-        return selectedGroup ? calculateProgress(selectedGroup, currentPointIndex) : null;
-      })()
-    : null;
-  
   return (
     <div className="vr-panorama-page">
       {/* 道の選択 */}
@@ -99,24 +91,6 @@ export default function VRPanoramaPage() {
         onRouteSelect={handleRouteSelect}
         isLoading={isLoadingLocationGroups}
       />
-
-      {/* 現在の場所とプログレス表示 */}
-      {selectedLocationId && currentLocation && progress && (
-        <div className="location-display">
-          <h2>選択された道を走行中</h2>
-          <p>緯度: {currentLocation.latitude.toFixed(6)}, 経度: {currentLocation.longitude.toFixed(6)}</p>
-          <div className="progress-info">
-            <p>進行状況: {progress.current} / {progress.total} ポイント ({progress.percentage.toFixed(1)}%)</p>
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${progress.percentage}%` }}
-              />
-            </div>
-          </div>
-          <p>VRコントローラーを1回交差させると次の地点に移動します</p>
-        </div>
-      )}
 
       {/* 道が選択されていない場合のメッセージ */}
       {!selectedLocationId && !isLoadingLocationGroups && (
