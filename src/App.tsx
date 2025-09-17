@@ -5,6 +5,7 @@ import HomeScreen from './HomeScreen';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
 import Map from './pages/map';
+import TimerStream from './components/TimerStream';
 import './styles/App.css';
 
 type AppState = 'login' | 'profile-create' | 'home' | 'game';
@@ -66,6 +67,9 @@ export default function App() {
     );
   }
 
+  // JWTをAuthServiceから取得
+  const jwt = AuthService.getAuthData().token;
+
   return (
     <div className="app-root">
       {appState === 'login' && (
@@ -86,7 +90,11 @@ export default function App() {
         />
       )}
       {appState === 'game' && (
-        <Map />
+        <>
+          <Map />
+          {/* JWTがあればTimerStreamを表示 */}
+          {jwt ? <TimerStream jwt={jwt} /> : <span>JWTがありません</span>}
+        </>
       )}
     </div>
   );
