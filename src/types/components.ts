@@ -15,11 +15,6 @@ export interface BasePanoramaProps {
     autoRotateSpeed?: number;
 }
 
-export interface InteractivePanoramaProps extends BasePanoramaProps {
-    /** VRサポート */
-    vrSupport?: boolean;
-}
-
 export interface VRPanoramaProps extends BasePanoramaProps {
     /** コントローラー表示の有効/無効 */
     showControllers?: boolean;
@@ -44,18 +39,3 @@ export interface Panorama360SphereProps {
     autoRotateSpeed?: number;
 }
 
-// StatusDisplayコンポーネントのプロパティ
-export interface StatusDisplayProps {
-    loading?: boolean;
-    error?: string | null;
-    loadingMessage?: string;
-    position?: [number, number, number];
-}
-
-// DebugInfoコンポーネントのプロパティ
-export interface DebugInfoProps {
-    apiKey?: string;
-    pathData?: PathData | null;
-    currentPointIndex?: number;
-    visible?: boolean;
-}
