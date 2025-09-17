@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { XR, createXRStore, XROrigin } from '@react-three/xr';
+import { XR, createXRStore, XROrigin, VRButton } from '@react-three/xr';
 import { Panorama360Sphere } from './Panorama360Sphere';
 import { ControllerVisualizer, ControllerConnectionLine, VRControllerCounter } from './VRControllerCounter';
 import { usePanoramaLoader } from '../hooks/usePanoramaLoader';
@@ -144,6 +144,25 @@ export function VRPanorama({
 }: VRPanoramaProps) {
   return (
     <div className="vr-panorama-container" style={{ position: 'relative' }}>
+      {/* VRヘッドセットに入るボタン */}
+      <VRButton 
+        store={xrStore}
+        style={{
+          position: 'absolute',
+          top: '60px',
+          right: '10px',
+          zIndex: 1000,
+          padding: '12px 24px',
+          backgroundColor: '#2196F3',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: 'bold'
+        }}
+      />
+      
       {/* 3DキャンバスwithVR */}
       <div className="vr-panorama-canvas" style={{ height: height }}>
         <Canvas

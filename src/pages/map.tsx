@@ -11,7 +11,7 @@ import '../styles/RouteSelection.css';
 export default function VRPanoramaPage() {
   const [pathData, _setPathData] = useState<PathData | null>(null);
   const [currentPointIndex, setCurrentPointIndex] = useState<number>(0); 
-  const [viewMode, setViewMode] = useState<'web' | 'vr'>('web'); 
+  const [isVRMode, setIsVRMode] = useState<boolean>(false);
   
   // APIから取得するデータの状態
   const [locationGroups, setLocationGroups] = useState<LocationGroup[]>([]);
@@ -99,38 +99,31 @@ export default function VRPanoramaPage() {
         </div>
       )}
 
-      {/* ビューモード切替ボタン */}
-      {selectedLocationId && currentLocation && (
-        <div className="view-mode-switcher">
-          <button
-            onClick={() => setViewMode('web')}
-            className={`view-mode-button ${viewMode === 'web' ? 'active' : 'inactive'}`}
-          >
-            Web版（360度ビュー）
-          </button>
-          <button
-            onClick={() => setViewMode('vr')}
-            className={`view-mode-button ${viewMode === 'vr' ? 'active' : 'inactive'}`}
-          >
-            VR版
-          </button>
-        </div>
-      )}
-
       {/* パノラマビュー */}
       {selectedLocationId && currentLocation && (
-        <div className="panorama-view-container">
-          {viewMode === 'web' ? (
-            <WebPanorama
-              pathData={pathData || undefined}
-              currentPointIndex={currentPointIndex}
-              apiKey={apiKey}
-              height="600px"
-              autoRotate={false}
-              latitude={currentLocation.latitude}
-              longitude={currentLocation.longitude}
-            />
-          ) : (
+        <div className="panorama-view-container" style={{ position: 'relative' }}>
+          {/* VR切り替えボタン */}
+          <button
+            onClick={() => setIsVRMode(!isVRMode)}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              zIndex: 1000,
+              padding: '12px 24px',
+              backgroundColor: isVRMode ? '#f44336' : '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold'
+            }}
+          >
+            {isVRMode ? 'Web表示に戻る' : 'VRモード'}
+          </button>
+
+          {isVRMode ? (
             <VRPanorama
               pathData={pathData || undefined}
               currentPointIndex={currentPointIndex}
@@ -141,6 +134,16 @@ export default function VRPanoramaPage() {
               latitude={currentLocation.latitude}
               longitude={currentLocation.longitude}
               onCountReached={handleCountReached}
+            />
+          ) : (
+            <WebPanorama
+              pathData={pathData || undefined}
+              currentPointIndex={currentPointIndex}
+              apiKey={apiKey}
+              height="600px"
+              autoRotate={false}
+              latitude={currentLocation.latitude}
+              longitude={currentLocation.longitude}
             />
           )}
         </div>
