@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
@@ -21,11 +20,6 @@ export default function App() {
     }
     setLoading(false);
   }, []);
-
-  const handleLogin = (userData: User) => {
-    setUser(userData);
-    setAppState('home');
-  };
 
   const handleStartGame = () => {
     setAppState('game');
