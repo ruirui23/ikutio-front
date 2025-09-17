@@ -101,24 +101,11 @@ export default function VRPanoramaPage() {
 
       {/* パノラマビュー */}
       {selectedLocationId && currentLocation && (
-        <div className="panorama-view-container" style={{ position: 'relative' }}>
+        <div className="panorama-view-container">
           {/* VR切り替えボタン */}
           <button
             onClick={() => setIsVRMode(!isVRMode)}
-            style={{
-              position: 'absolute',
-              top: '10px',
-              right: '10px',
-              zIndex: 1000,
-              padding: '12px 24px',
-              backgroundColor: isVRMode ? '#f44336' : '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
+            className={`vr-toggle-button ${isVRMode ? 'vr-mode' : 'web-mode'}`}
           >
             {isVRMode ? 'Web表示に戻る' : 'VRモード'}
           </button>

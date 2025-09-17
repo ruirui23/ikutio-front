@@ -92,3 +92,30 @@
 .panorama-view-container {
   position: relative;
 }
+
+.vr-toggle-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  padding: 12px 24px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.vr-toggle-button.vr-mode {
+  background-color: #f44336;
+}
+
+.vr-toggle-button.web-mode {
+  background-color: #4CAF50;
+}
+
+.vr-toggle-button:hover {
+  opacity: 0.9;
+}

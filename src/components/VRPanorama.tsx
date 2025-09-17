@@ -172,8 +172,7 @@ export function VRPanorama({
             near: 0.1,
             far: 1000
           }}
-          gl={{
-            antialias: true,
+          gl={{           antialias: true,
             alpha: false
           }}
         >

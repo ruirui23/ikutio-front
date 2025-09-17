@@ -86,6 +86,26 @@
   margin: 2px 0;
 }
 
+/* VRButton スタイル */
+.vr-button {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  z-index: 1000;
+  padding: 12px 24px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.vr-button:hover {
+  background-color: #1976D2;
+}
+
 /* 3DキャンバスwithVR */
 .vr-panorama-canvas {
   width: 100%;
