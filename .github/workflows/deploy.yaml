@@ -15,8 +15,7 @@ jobs:
 
     env:
       SERVICE_NAME: 'ikutio-front'
-      REGION: 'asia-northeast1'
-      ARTIFACT_REGISTRY: 'asia-northeast1-docker.pkg.dev'
+      REGION: 'asia-northeast1' 
 
     steps:
       - name: Checkout repository
@@ -33,22 +32,22 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker for Artifact Registry
+      - name: Configure Docker for GCR (using token)
         run: |
-          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin ${{ env.ARTIFACT_REGISTRY }}
+          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin gcr.io
 
       - name: Build Docker image
         run: |
-          docker build --no-cache -t ${{ env.ARTIFACT_REGISTRY }}/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:$GITHUB_SHA .
+          docker build --no-cache -t gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}:$GITHUB_SHA .
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:$GITHUB_SHA
+          docker push gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}:$GITHUB_SHA
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.ARTIFACT_REGISTRY }}/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:$GITHUB_SHA \
+            --image gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}:$GITHUB_SHA \
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
