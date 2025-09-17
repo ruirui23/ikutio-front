@@ -4,9 +4,10 @@ interface HomeScreenProps {
   user: User | null;
   onStartGame: () => void;
   onLogout: () => void;
+  onStartVRDemo?: () => void;
 }
 
-export default function HomeScreen({ user, onStartGame, onLogout }: HomeScreenProps) {
+export default function HomeScreen({ user, onStartGame, onLogout, onStartVRDemo }: HomeScreenProps) {
   return (
     <div style={{
       width: '100vw',
@@ -70,24 +71,47 @@ export default function HomeScreen({ user, onStartGame, onLogout }: HomeScreenPr
           VRを使ってマラソンをしよう！
         </p>
 
-        <button
-          onClick={onStartGame}
-          style={{
-            padding: '16px 32px',
-            fontSize: '18px',
-            fontWeight: '600',
-            background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(231, 76, 60, 0.4)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            minWidth: '200px'
-          }}
-        >
-          スタート
-        </button>
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={onStartGame}
+            style={{
+              padding: '16px 32px',
+              fontSize: '18px',
+              fontWeight: '600',
+              background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(231, 76, 60, 0.4)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              minWidth: '200px'
+            }}
+          >
+            マラソンスタート
+          </button>
+
+          {onStartVRDemo && (
+            <button
+              onClick={onStartVRDemo}
+              style={{
+                padding: '16px 32px',
+                fontSize: '18px',
+                fontWeight: '600',
+                background: 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(155, 89, 182, 0.4)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                minWidth: '200px'
+              }}
+            >
+              VRコントローラーデモ
+            </button>
+          )}
+        </div>
 
         <div style={{
           display: 'grid',
