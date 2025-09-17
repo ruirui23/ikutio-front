@@ -4,9 +4,10 @@ import type { User } from './types/user';
 
 interface LoginScreenProps {
   onLogin: (user: User) => void;
+  onGuestAccess: () => void;
 }
 
-export default function LoginScreen({ onLogin }: LoginScreenProps) {
+export default function LoginScreen({ onLogin, onGuestAccess }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -133,10 +134,38 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               borderRadius: '8px',
               fontSize: '16px',
               fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer'
+              cursor: loading ? 'not-allowed' : 'pointer',
+              marginBottom: '12px'
             }}
           >
             {loading ? 'ログイン中...' : 'ログイン'}
+          </button>
+
+          <button
+            type="button"
+            onClick={onGuestAccess}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: 'transparent',
+              color: '#667eea',
+              border: '2px solid #667eea',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = '#667eea';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = '#667eea';
+            }}
+          >
+            ゲストとしてアクセス
           </button>
         </form>
 
