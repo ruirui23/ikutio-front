@@ -25,14 +25,6 @@ export default function App() {
     setAppState('game');
   };
 
-  const handleGuestAccess = () => {
-    setAppState('game');
-  };
-
-  const handleGuestAccess = () => {
-    setAppState('game');
-  };
-
   const handleLogout = () => {
     AuthService.logout();
     setUser(null);
@@ -52,9 +44,10 @@ export default function App() {
       {appState === 'login' && (
         // <LoginScreen onLogin={handleLogin} />
         <Map />
+      )}
       {appState === 'home' && (
-        <HomeScreen 
-          user={user} 
+        <HomeScreen
+          user={user}
           onStartGame={handleStartGame}
           onLogout={handleLogout}
         />
