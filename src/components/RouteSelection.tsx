@@ -12,7 +12,7 @@ export function RouteSelection({ locationGroups, selectedLocationId, onRouteSele
     return (
       <div className="route-selection">
         <h3>道を読み込み中...</h3>
-        <div className="loading-spinner">⌛</div>
+        <div className="loading-spinner">Loading...</div>
       </div>
     );
   }
@@ -49,7 +49,7 @@ export function RouteSelection({ locationGroups, selectedLocationId, onRouteSele
               )}
             </div>
             {selectedLocationId === group.location_id && (
-              <div className="selected-indicator">✓</div>
+              <div className="selected-indicator">Selected</div>
             )}
           </div>
         ))}

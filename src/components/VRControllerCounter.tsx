@@ -173,7 +173,7 @@ export function VRControllerCounterDisplay({
         総計: {leftCount + rightCount}回
       </div>
       <div className="vr-counter-instruction">
-        💡 左右のコントローラーをY軸で交差させてください
+        左右のコントローラーをY軸で交差させてください
       </div>
     </div>
   );

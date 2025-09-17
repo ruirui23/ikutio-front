@@ -200,7 +200,7 @@ export class StreetViewService {
                     console.log('Loading progress:', progress);
                 },
                 (error) => {
-                    console.error('❌ Error loading Street View image:', error);
+                    console.error('Error loading Street View image:', error);
 
                     // エラーが発生した場合はテストテクスチャを返す
                     const testTexture = StreetViewService.createTestTexture();
