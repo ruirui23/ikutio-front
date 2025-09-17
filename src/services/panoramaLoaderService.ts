@@ -59,8 +59,8 @@ export class PanoramaLoaderService {
             const currentPoint = pathData.pathData[Math.min(currentPointIndex, pathData.pathData.length - 1)];
             return this.loadPanoramaUrl(currentPoint.latitude, currentPoint.longitude, apiKey);
         } else {
-            // デフォルトの場所（東京駅）
-            return this.loadPanoramaUrl(35.6812, 139.7671, apiKey);
+            // pathDataが存在しない場合はエラーを投げる
+            throw new Error('有効なパスデータが提供されていません');
         }
     }
 

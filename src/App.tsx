@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import { AuthService } from './services/auth';
 import type { User } from './types/user';
@@ -22,12 +21,11 @@ export default function App() {
     setLoading(false);
   }, []);
 
-  const handleLogin = (userData: User) => {
-    setUser(userData);
-    setAppState('home');
+  const handleStartGame = () => {
+    setAppState('game');
   };
 
-  const handleStartGame = () => {
+  const handleGuestAccess = () => {
     setAppState('game');
   };
 
@@ -52,8 +50,8 @@ export default function App() {
   return (
     <div className="app-root">
       {appState === 'login' && (
-        <LoginScreen onLogin={handleLogin} onGuestAccess={handleGuestAccess} />
-      )}
+        // <LoginScreen onLogin={handleLogin} />
+        <Map />
       {appState === 'home' && (
         <HomeScreen 
           user={user} 

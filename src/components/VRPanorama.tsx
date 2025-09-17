@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
 import { Panorama360Sphere } from './Panorama360Sphere';
-import { ControllerVisualizer, ControllerConnectionLine } from './VRControllerCounter';
+import { ControllerVisualizer, ControllerConnectionLine, VRControllerCounter } from './VRControllerCounter';
 import { usePanoramaLoader } from '../hooks/usePanoramaLoader';
 import type { VRPanoramaProps } from '../types/components';
 import type { PathData } from '../types/streetView';
@@ -36,7 +36,10 @@ function VRPanoramaLoader({
   apiKey,
   autoRotate = false,
   autoRotateSpeed = 0.002,
-  showControllers = false
+  showControllers = false,
+  latitude,
+  longitude,
+  onCountReached
 }: {
   pathData?: PathData;
   currentPointIndex?: number;
@@ -44,12 +47,29 @@ function VRPanoramaLoader({
   autoRotate?: boolean;
   autoRotateSpeed?: number;
   showControllers?: boolean;
+  latitude?: number;
+  longitude?: number;
+  onCountReached?: (totalCount: number) => void;
 }) {
-  const { panoramaUrl, loading, error } = usePanoramaLoader({
+  const { panoramaUrl, loading, error, loadPanorama } = usePanoramaLoader({
     pathData,
     currentPointIndex,
-    apiKey
+    apiKey,
+    latitude,
+    longitude
   });
+
+  // VRControllerCounterからカウント情報を取得
+  VRControllerCounter({
+    onCountReached
+  });
+
+  // 緯度経度が提供された場合は直接読み込む
+  useEffect(() => {
+    if (latitude !== undefined && longitude !== undefined) {
+      loadPanorama(latitude, longitude, apiKey);
+    }
+  }, [latitude, longitude, apiKey, loadPanorama]);
 
   return (
     <>
@@ -74,6 +94,17 @@ function VRPanoramaLoader({
         autoRotate={autoRotate}
         autoRotateSpeed={autoRotateSpeed}
       />
+      
+      {/* カウント表示（VRビュー内） */}
+      {showControllers && (
+        <group position={[0, -0.5, -1.5]}>
+          <mesh>
+            <planeGeometry args={[2, 0.5]} />
+            <meshBasicMaterial color="#333333" transparent opacity={0.8} />
+          </mesh>
+        </group>
+      )}
+      
       {loading && (
         <mesh position={[0, 0, -2]}>
           <planeGeometry args={[4, 2]} />
@@ -106,7 +137,10 @@ export function VRPanorama({
   height = '600px',
   autoRotate = false,
   autoRotateSpeed = 0.002,
-  showControllers = false
+  showControllers = false,
+  latitude,
+  longitude,
+  onCountReached
 }: VRPanoramaProps) {
   return (
     <div className="vr-panorama-container" style={{ position: 'relative' }}>
@@ -119,8 +153,7 @@ export function VRPanorama({
             near: 0.1,
             far: 1000
           }}
-          gl={{
-            antialias: true,
+          gl={{ antialias: true,
             alpha: false
           }}
         >
@@ -132,6 +165,9 @@ export function VRPanorama({
               autoRotate={autoRotate}
               autoRotateSpeed={autoRotateSpeed}
               showControllers={showControllers}
+              latitude={latitude}
+              longitude={longitude}
+              onCountReached={onCountReached}
             />
           </XR>
         </Canvas>

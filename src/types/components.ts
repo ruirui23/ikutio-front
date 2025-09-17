@@ -13,6 +13,10 @@ export interface BasePanoramaProps {
     autoRotate?: boolean;
     /** 自動回転速度 */
     autoRotateSpeed?: number;
+    /** 緯度 */
+    latitude?: number;
+    /** 経度 */
+    longitude?: number;
 }
 
 export interface InteractivePanoramaProps extends BasePanoramaProps {
@@ -23,6 +27,8 @@ export interface InteractivePanoramaProps extends BasePanoramaProps {
 export interface VRPanoramaProps extends BasePanoramaProps {
     /** コントローラー表示の有効/無効 */
     showControllers?: boolean;
+    /** カウントが10の倍数に達した時のコールバック */
+    onCountReached?: (totalCount: number) => void;
 }
 
 // Panorama360Sphereコンポーネントのプロパティ
