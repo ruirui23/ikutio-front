@@ -29,6 +29,8 @@ export interface VRPanoramaProps extends BasePanoramaProps {
     showControllers?: boolean;
     /** カウントが10の倍数に達した時のコールバック */
     onCountReached?: (totalCount: number) => void;
+    /** コース完走状態 */
+    isCompleted?: boolean;
 }
 
 // Panorama360Sphereコンポーネントのプロパティ

@@ -31,6 +31,10 @@ export default function App() {
     setAppState('login');
   };
 
+  const handleReturnHome = () => {
+    setAppState('login');
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -43,7 +47,7 @@ export default function App() {
     <div className="app-root">
       {appState === 'login' && (
         // <LoginScreen onLogin={handleLogin} />
-        <Map />
+        <Map onReturnHome={handleReturnHome} />
       )}
       {appState === 'home' && (
         <HomeScreen
@@ -53,7 +57,7 @@ export default function App() {
         />
       )}
       {appState === 'game' && (
-        <Map />
+        <Map onReturnHome={handleReturnHome} />
       )}
     </div>
   );
