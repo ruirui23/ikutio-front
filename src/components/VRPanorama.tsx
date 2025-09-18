@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { XR, createXRStore, XROrigin } from '@react-three/xr';
+import { Text } from '@react-three/drei';
 import { Panorama360Sphere } from './Panorama360Sphere';
 import { ControllerVisualizer, ControllerConnectionLine, VRControllerCounter } from './VRControllerCounter';
 import { usePanoramaLoader } from '../hooks/usePanoramaLoader';
@@ -39,7 +40,8 @@ function VRPanoramaLoader({
   showControllers = false,
   latitude,
   longitude,
-  onCountReached
+  onCountReached,
+  isCompleted = false
 }: {
   pathData?: PathData;
   currentPointIndex?: number;
@@ -50,6 +52,7 @@ function VRPanoramaLoader({
   latitude?: number;
   longitude?: number;
   onCountReached?: (totalCount: number) => void;
+  isCompleted?: boolean;
 }) {
   const { panoramaUrl, loading, error, loadPanorama } = usePanoramaLoader({
     pathData,
@@ -105,6 +108,28 @@ function VRPanoramaLoader({
         </group>
       )}
       
+      {/* 完走メッセージ表示 */}
+      {isCompleted && (
+        <group position={[0, 0, -2]}>
+          {/* 背景板 */}
+          <mesh>
+            <planeGeometry args={[6, 2]} />
+            <meshBasicMaterial color="#4CAF50" transparent opacity={0.9} />
+          </mesh>
+          {/* テキスト */}
+          <Text
+            position={[0, 0, 0.01]}
+            fontSize={0.5}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+          >
+            走りきりました！
+          </Text>
+        </group>
+      )}
+      
       {loading && (
         <mesh position={[0, 0, -2]}>
           <planeGeometry args={[4, 2]} />
@@ -140,7 +165,8 @@ export function VRPanorama({
   showControllers = false,
   latitude,
   longitude,
-  onCountReached
+  onCountReached,
+  isCompleted = false
 }: VRPanoramaProps) {
   return (
     <div className="vr-panorama-container" style={{ position: 'relative' }}>
@@ -168,6 +194,7 @@ export function VRPanorama({
               latitude={latitude}
               longitude={longitude}
               onCountReached={onCountReached}
+              isCompleted={isCompleted}
             />
           </XR>
         </Canvas>

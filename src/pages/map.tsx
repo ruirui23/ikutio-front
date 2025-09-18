@@ -8,10 +8,15 @@ import { fetchLocationGroups, findLocationGroupById, getCurrentLocation } from '
 import '../styles/map.css';
 import '../styles/RouteSelection.css';
 
-export default function VRPanoramaPage() {
+interface VRPanoramaPageProps {
+  onReturnHome?: () => void;
+}
+
+export default function VRPanoramaPage({ onReturnHome }: VRPanoramaPageProps) {
   const [pathData, _setPathData] = useState<PathData | null>(null);
   const [currentPointIndex, setCurrentPointIndex] = useState<number>(0); 
   const [isVRMode, setIsVRMode] = useState<boolean>(false);
+  const [isCompleted, setIsCompleted] = useState<boolean>(false); // コース完走状態を追加
   
   // APIから取得するデータの状態
   const [locationGroups, setLocationGroups] = useState<LocationGroup[]>([]);
@@ -45,6 +50,7 @@ export default function VRPanoramaPage() {
       if (selectedGroup && selectedGroup.locations.length > 0) {
         setCurrentPointIndex(0);
         setCurrentLocation(selectedGroup.locations[0]);
+        setIsCompleted(false); // 道が変更されたら完走状態をリセット
       }
     }
   }, [selectedLocationId, locationGroups]);
@@ -64,18 +70,25 @@ export default function VRPanoramaPage() {
     if (selectedLocationId && locationGroups.length > 0) {
       const selectedGroup = findLocationGroupById(locationGroups, selectedLocationId);
       if (selectedGroup) {
-        // 1回カウントごとに次の地点に進む
-        const newIndex = Math.min(currentPointIndex + 1, selectedGroup.locations.length - 1);
-        setCurrentPointIndex(newIndex);
-        
-        if (newIndex < selectedGroup.locations.length - 1) {
-          console.log(`カウント${totalCount}回達成！次の地点に移動しました (${newIndex + 1}/${selectedGroup.locations.length})`);
-        } else {
+        // 現在が最後の地点かチェック
+        if (currentPointIndex >= selectedGroup.locations.length - 1) {
           console.log('道の最後まで到達しました！');
+          setIsCompleted(true); // 完走状態を設定
+          // 3秒後にHomeに戻る（完走メッセージを表示する時間を確保）
+          setTimeout(() => {
+            if (onReturnHome) {
+              onReturnHome();
+            }
+          }, 3000);
+        } else {
+          // 次の地点に進む
+          const newIndex = currentPointIndex + 1;
+          setCurrentPointIndex(newIndex);
+          console.log(`カウント${totalCount}回達成！次の地点に移動しました (${newIndex + 1}/${selectedGroup.locations.length})`);
         }
       }
     }
-  }, [selectedLocationId, locationGroups, currentPointIndex]);
+  }, [selectedLocationId, locationGroups, currentPointIndex, onReturnHome]);
   
   // 道を選択したときの処理
   const handleRouteSelect = useCallback((locationId: string) => {
@@ -121,6 +134,7 @@ export default function VRPanoramaPage() {
               latitude={currentLocation.latitude}
               longitude={currentLocation.longitude}
               onCountReached={handleCountReached}
+              isCompleted={isCompleted}
             />
           ) : (
             <WebPanorama
