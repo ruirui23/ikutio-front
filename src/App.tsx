@@ -48,14 +48,11 @@ export default function App() {
     );
   }
 
-  const handleGuestAccess = () => {
-    setAppState('home');
-  };
 
   return (
     <div className="app-root">
       {appState === 'login' && (
-        <LoginScreen onLogin={handleLogin} onGuestAccess={handleGuestAccess} />
+        <LoginScreen onLogin={handleLogin} />
       )}
       {appState === 'home' && (
         <HomeScreen

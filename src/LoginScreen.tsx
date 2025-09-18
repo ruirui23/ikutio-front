@@ -4,10 +4,9 @@ import type { User } from './types/user';
 
 interface LoginScreenProps {
   onLogin: (user: User) => void;
-  onGuestAccess: () => void;
 }
 
-export default function LoginScreen({ onLogin, onGuestAccess }: LoginScreenProps) {
+export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
