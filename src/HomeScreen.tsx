@@ -11,152 +11,290 @@ export default function HomeScreen({ user, onStartGame, onLogout, onStartVRDemo 
   return (
     <div style={{
       width: '100vw',
-      height: '100vh',
-      background: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
+      minHeight: '100vh',
+      background: 'radial-gradient(ellipse 80% 80% at 50% 20%, #f5f7fa 80%, #e3e6ee 100%)',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      color: 'white'
+      fontFamily: '"Segoe UI", "Hiragino Sans", "Meiryo", sans-serif',
+      color: '#222'
     }}>
-      {/* ヘッダー */}
-      <div style={{
-        position: 'absolute',
-        top: '20px',
-        right: '20px',
+      <header style={{
+        width: '100%',
         display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: '15px'
+        padding: '32px 64px',
+        boxSizing: 'border-box',
+        background: 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #e5e7eb',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.03)'
       }}>
-        <span style={{ fontSize: '16px' }}>
-          Welcome, {user?.username || user?.email}
-        </span>
-        <button
-          onClick={onLogout}
-          style={{
-            padding: '8px 16px',
-            background: 'rgba(255, 255, 255, 0.2)',
-            color: 'white',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          ログアウト
-        </button>
-      </div>
-
-      {/* メインコンテンツ */}
-      <div style={{
-        textAlign: 'center',
-        maxWidth: '600px',
-        padding: '0 20px'
-      }}>
-        <h1 style={{
-          fontSize: '48px',
-          fontWeight: '700',
-          marginBottom: '20px',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+        <div style={{ 
+          fontSize: '24px', 
+          fontWeight: '700', 
+          color: '#3b3b3b',
+          letterSpacing: '-0.02em',
+          fontFamily: 'inherit',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
         }}>
-          24時間疑似マラソン
-        </h1>
-
-        <p style={{
-          fontSize: '20px',
-          marginBottom: '40px',
-          opacity: 0.9,
-          lineHeight: '1.6'
-        }}>
-          VRを使ってマラソンをしよう！
-        </p>
-
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <span style={{fontSize: '1.3em'}}>🏃‍♂️</span> 24時間疑似マラソン
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <span style={{ 
+            fontSize: '16px', 
+            color: '#666',
+            fontWeight: '500',
+            letterSpacing: '-0.01em'
+          }}>
+            {user?.username || user?.email}
+          </span>
           <button
-            onClick={onStartGame}
+            onClick={onLogout}
             style={{
-              padding: '16px 32px',
-              fontSize: '18px',
-              fontWeight: '600',
-              background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
-              color: 'white',
+              padding: '12px 28px',
+              background: 'linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 100%)',
+              color: '#444',
               border: 'none',
-              borderRadius: '12px',
+              borderRadius: '16px',
               cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(231, 76, 60, 0.4)',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              minWidth: '200px'
+              fontSize: '15px',
+              fontWeight: '500',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              transition: 'all 0.2s ease'
             }}
           >
-            マラソンスタート
+            ログアウト
           </button>
+        </div>
+      </header>
 
-          {onStartVRDemo && (
+      <main style={{
+        textAlign: 'center',
+        width: '100%',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '0 32px',
+        marginTop: '80px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <div style={{
+          background: 'rgba(255,255,255,0.98)',
+          borderRadius: '32px',
+          padding: '56px 44px',
+          boxShadow: '0 12px 48px rgba(0,0,0,0.10)',
+          border: '1px solid #e5e7eb',
+          marginBottom: '40px',
+          width: '100%',
+          maxWidth: '700px'
+        }}>
+          <h1 style={{
+            fontSize: '38px',
+            fontWeight: '800',
+            marginBottom: '18px',
+            color: '#222',
+            letterSpacing: '-0.02em',
+            fontFamily: 'inherit'
+          }}>
+            24時間疑似マラソン
+          </h1>
+          <p style={{ 
+            fontSize: '20px', 
+            marginBottom: '38px', 
+            color: '#555',
+            fontWeight: '400',
+            lineHeight: '1.6'
+          }}>
+            VRを使ってマラソンをしよう！
+          </p>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '24px',
+            marginBottom: '44px',
+            justifyContent: 'center'
+          }}>
             <button
-              onClick={onStartVRDemo}
+              onClick={onStartGame}
               style={{
-                padding: '16px 32px',
-                fontSize: '18px',
-                fontWeight: '600',
-                background: 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)',
-                color: 'white',
+                padding: '20px 56px',
+                fontSize: '20px',
+                fontWeight: '700',
+                background: 'linear-gradient(90deg, #6366f1 0%, #7c3aed 100%)',
+                color: '#fff',
                 border: 'none',
-                borderRadius: '12px',
+                borderRadius: '24px',
                 cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(155, 89, 182, 0.4)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                minWidth: '200px'
+                minWidth: '240px',
+                boxShadow: '0 6px 24px rgba(99,102,241,0.18)',
+                transition: 'all 0.2s ease'
               }}
             >
-              VRコントローラーデモ
+              マラソンスタート
             </button>
-          )}
+
+            {onStartVRDemo && (
+              <button
+                onClick={onStartVRDemo}
+                style={{
+                  padding: '18px 44px',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  background: 'linear-gradient(90deg, #fff 0%, #ede9fe 100%)',
+                  color: '#7c3aed',
+                  border: '2px solid #7c3aed',
+                  borderRadius: '24px',
+                  cursor: 'pointer',
+                  minWidth: '240px',
+                  boxShadow: '0 2px 8px rgba(124,58,237,0.08)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                VRコントローラーデモ
+              </button>
+            )}
+          </div>
         </div>
 
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '20px',
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '32px',
+          justifyContent: 'center',
           width: '100%',
-          marginTop: '40px'
+          maxWidth: '1100px',
+          margin: '0 auto',
+          marginBottom: '60px'
         }}>
           <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            padding: '20px',
-            borderRadius: '8px',
-            textAlign: 'center'
+            background: 'linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%)',
+            borderRadius: '18px',
+            padding: '32px',
+            border: '1px solid #e0e7ff',
+            position: 'relative',
+            boxShadow: '0 2px 12px rgba(99,102,241,0.06)',
+            minWidth: '260px',
+            maxWidth: '340px',
+            flex: '1 1 0'
           }}>
-            <h3 style={{ marginBottom: '10px' }}>360度体験</h3>
-            <p style={{ fontSize: '14px', opacity: 0.8 }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '18px',
+              color: '#fff',
+              fontWeight: '700',
+              fontSize: '22px'
+            }}>
+              360°
+            </div>
+            <h3 style={{ 
+              color: '#222', 
+              fontSize: '19px',
+              fontWeight: '700',
+              margin: '0 0 12px 0'
+            }}>360度体験</h3>
+            <p style={{ 
+              fontSize: '16px', 
+              color: '#64748B',
+              margin: 0,
+              lineHeight: '1.6'
+            }}>
               マウスやVRコントローラーで自由に視点を変更
             </p>
           </div>
 
           <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            padding: '20px',
-            borderRadius: '8px',
-            textAlign: 'center'
+            background: 'linear-gradient(135deg, #f0fdf4 0%, #f7fee7 100%)',
+            borderRadius: '18px',
+            padding: '32px',
+            border: '1px solid #bbf7d0',
+            boxShadow: '0 2px 12px rgba(16,185,129,0.06)',
+            minWidth: '260px',
+            maxWidth: '340px',
+            flex: '1 1 0'
           }}>
-            <h3 style={{ marginBottom: '10px' }}>位置取得</h3>
-            <p style={{ fontSize: '14px', opacity: 0.8 }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '18px',
+              color: '#fff',
+              fontWeight: '700',
+              fontSize: '24px'
+            }}>
+              📍
+            </div>
+            <h3 style={{ 
+              color: '#222', 
+              fontSize: '19px',
+              fontWeight: '700',
+              margin: '0 0 12px 0'
+            }}>位置取得</h3>
+            <p style={{ 
+              fontSize: '16px', 
+              color: '#64748B',
+              margin: 0,
+              lineHeight: '1.6'
+            }}>
               自分の走った場所を取得
             </p>
           </div>
 
           <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            padding: '20px',
-            borderRadius: '8px',
-            textAlign: 'center'
+            background: 'linear-gradient(135deg, #fef3f2 0%, #fff7ed 100%)',
+            borderRadius: '18px',
+            padding: '32px',
+            border: '1px solid #fed7aa',
+            boxShadow: '0 2px 12px rgba(251,191,36,0.06)',
+            minWidth: '260px',
+            maxWidth: '340px',
+            flex: '1 1 0'
           }}>
-            <h3 style={{ marginBottom: '10px' }}>VR対応</h3>
-            <p style={{ fontSize: '14px', opacity: 0.8 }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '18px',
+              color: '#fff',
+              fontWeight: '700',
+              fontSize: '24px'
+            }}>
+              🥽
+            </div>
+            <h3 style={{ 
+              color: '#222', 
+              fontSize: '19px',
+              fontWeight: '700',
+              margin: '0 0 12px 0'
+            }}>VR対応</h3>
+            <p style={{ 
+              fontSize: '16px', 
+              color: '#64748B',
+              margin: 0,
+              lineHeight: '1.6'
+            }}>
               Meta Quest 3で没入感のある体験
             </p>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

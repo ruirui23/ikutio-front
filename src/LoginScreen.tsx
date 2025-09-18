@@ -141,46 +141,10 @@ export default function LoginScreen({ onLogin, onGuestAccess }: LoginScreenProps
             {loading ? 'ログイン中...' : 'ログイン'}
           </button>
 
-          <button
-            type="button"
-            onClick={onGuestAccess}
-            style={{
-              width: '100%',
-              padding: '14px',
-              background: 'transparent',
-              color: '#667eea',
-              border: '2px solid #667eea',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = '#667eea';
-              e.currentTarget.style.color = 'white';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = '#667eea';
-            }}
-          >
-            ゲストとしてアクセス
-          </button>
+          {/* ゲストアクセスボタン削除 */}
         </form>
 
-        <div style={{
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '6px',
-          fontSize: '14px',
-          color: '#666'
-        }}>
-          <strong>テスト用アカウント:</strong><br />
-          メール: test@example.com<br />
-          パスワード: password
-        </div>
+        {/* テスト用アカウント情報削除 */}
       </div>
     </div>
   );
